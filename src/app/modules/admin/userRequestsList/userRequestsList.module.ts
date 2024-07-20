@@ -1,17 +1,17 @@
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
-import { ExampleComponent } from 'app/modules/admin/example/example.component';
+import {  userRequestsListComponent } from 'app/modules/admin/userRequestsList/userRequestsList.component';
 
 const exampleRoutes: Route[] = [
     {
         path     : '',
-        component: ExampleComponent
+        component: userRequestsListComponent
     }
 ];
 
 @NgModule({
     declarations: [
-        ExampleComponent
+        userRequestsListComponent
     ],
     imports     : [
         RouterModule.forChild(exampleRoutes)
