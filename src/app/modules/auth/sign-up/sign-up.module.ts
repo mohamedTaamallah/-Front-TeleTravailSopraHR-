@@ -15,6 +15,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatStepperModule } from '@angular/material/stepper';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatSelectModule} from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
     declarations: [
@@ -35,7 +36,8 @@ import {MatSelectModule} from '@angular/material/select';
         MatNativeDateModule,
         MatStepperModule,
         MatDatepickerModule,
-        MatSelectModule
+        MatSelectModule,
+        MatRadioModule,
     ]
 })
 export class AuthSignUpModule

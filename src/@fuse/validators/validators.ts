@@ -123,6 +123,16 @@ export class FuseValidators {
             return Object.keys(errors).length !== 0 ? errors : null;
         };
     }
-
+    /**
+     * day of study validators 
+     */    
+    static exactlyTwoDaysValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const selectedDays = control.value;
+            return Array.isArray(selectedDays) && selectedDays.length === 2 
+                ? null 
+                : { twoDays: true };
+        };
+    }
     
 }

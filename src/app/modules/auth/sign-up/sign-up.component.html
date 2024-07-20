@@ -8,13 +8,7 @@
 
             <!-- Title -->
             <!-- <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Sign up</div> -->
-            <div class="flex items-baseline mt-0.5 font-medium">
-                <div>Already have an account?</div>
-                <a
-                    class="ml-1 text-primary-500 hover:underline"
-                    [routerLink]="['/sign-in']">Sign in
-                </a>
-            </div>
+
 
             <!-- Alert -->
             <fuse-alert
@@ -38,25 +32,25 @@
                     [stepControl]="signUpForm.get('step1')"
                     #verticalStepperStep1>
                     <ng-template matStepLabel>Basic information</ng-template>
-                    <p class="my-6 font-medium">
-                        People here will get to know you with this information
+                    <p class="my-6 font-bold">
+                        In this section we need you basic informations
                     </p>
                     <!-- Full Name -->
                     <div class="flex">
                         <mat-form-field class="flex-auto">
                             <input
                                 matInput
-                                [formControlName]="'nom'"
+                                [formControlName]="'fullName'"
                                 [placeholder]="'Full name'"
                                 required>
                             <mat-icon
                                 class="icon-size-5"
                                 matPrefix
                                 [svgIcon]="'heroicons_outline:user'"></mat-icon>
-                                <mat-error *ngIf="signUpForm.get('step1.nom').hasError('required')">Full name is required</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step1.nom').hasError('invalidFormat')">Full name should contain only numbers</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step1.nom').hasError('minlength')">Full name should be at least 3 letters long</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step1.nom').hasError('maxlength')">Full name maximum 20 letters long</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step1.fullName').hasError('required')">Full name is required</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step1.fullName').hasError('invalidFormat')">Full name should contain only numbers</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step1.fullName').hasError('minlength')">Full name should be at least 3 letters long</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step1.fullName').hasError('maxlength')">Full name maximum 20 letters long</mat-error>
                         
                             </mat-form-field>
                     </div>
@@ -64,19 +58,17 @@
                          <!-- NcIn -->
                         <mat-form-field class="flex-auto">
                             <input
-                                (input)="checkFieldExists('ncin')"
+                                (input)="checkFieldExists('sopraID')"
                                 matInput
-                                [formControlName]="'ncin'"
-                                [placeholder]="'NCIN'"
+                                [formControlName]="'sopraID'"
+                                [placeholder]="'Sopra Identifier'"
                                 required>
                             <mat-icon
                                 class="icon-size-5"
                                 matPrefix
                                 [svgIcon]="'heroicons_outline:identification'"></mat-icon>
-                                <mat-error *ngIf="signUpForm.get('step1.ncin').hasError('required')">NCIN is required</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step1.ncin').hasError('invalidFormat')">NCIN should contain only numbers</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step1.ncin').hasError('invalidLength')">NCIN should be exactly 8 digits long</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step1.ncin').hasError('Exist')">NCIN already exists</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step1.sopraID').hasError('required')">sopraID is required</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step1.sopraID').hasError('Exist')">sopraID already exists</mat-error>
                             </mat-form-field>
                     </div>
                     <div class="flex">
@@ -84,16 +76,16 @@
                        <mat-form-field class="flex-auto">
                            <input
                                matInput
-                               [formControlName]="'numTel'"
+                               [formControlName]="'phoneNumber'"
                                [placeholder]="'Phone Number'"
                                required>
                            <mat-icon
                                class="icon-size-5"
                                matPrefix
                                [svgIcon]="'heroicons_outline:phone'"></mat-icon>
-                               <mat-error *ngIf="signUpForm.get('step1.numTel').hasError('required')">Phone Number is required</mat-error>
-                               <mat-error *ngIf="signUpForm.get('step1.numTel').hasError('invalidFormat')">Phone should contain only numbers</mat-error>
-                               <mat-error *ngIf="signUpForm.get('step1.numTel').hasError('invalidLength')">Phone should be exactly 8 digits long</mat-error>
+                               <mat-error *ngIf="signUpForm.get('step1.phoneNumber').hasError('required')">Phone Number is required</mat-error>
+                               <mat-error *ngIf="signUpForm.get('step1.phoneNumber').hasError('invalidFormat')">Phone should contain only numbers</mat-error>
+                               <mat-error *ngIf="signUpForm.get('step1.phoneNumber').hasError('invalidLength')">Phone should be exactly 8 digits long</mat-error>
                        </mat-form-field>
                    </div>
                 <div class="flex">
@@ -119,8 +111,8 @@
                    <div class="flex"> 
                     <mat-form-field class="flex-auto gt-xs:pr-3">
                         <mat-select
-                            [formControlName]="'sexe'"
-                            [placeholder]="'Choose your sexe'"
+                            [formControlName]="'gender'"
+                            [placeholder]="'Choose your gender'"
                             required
                         >
                             <mat-option value="Male"
@@ -137,81 +129,10 @@
                                 'heroicons_outline:chevron-double-right'
                             "
                         ></mat-icon>
-                        <mat-error *ngIf="signUpForm.get('step1.sexe').hasError('required')">Please choose your sexe</mat-error>
+                        <mat-error *ngIf="signUpForm.get('step1.gender').hasError('required')">Please choose your gender</mat-error>
                     </mat-form-field>
                    </div>
-
-                    <!--  date Naissance -->
-                    <div class="font-medium">Birth Date</div>
-                    <div
-                        class="relative flex items-center mt-1.5 px-4 leading-9 rounded-full cursor-pointer text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700"
-                        (click)="dueDatePicker.open()"
-                    >
-                        <mat-icon
-                            class="icon-size-5 text-current"
-                            [svgIcon]="'heroicons_solid:calendar'"
-                        ></mat-icon>
-                        <span class="ml-2 text-md font-medium">
-                            <ng-container
-                                *ngIf="
-                                    signUpForm.get(
-                                        'step1.dateNaissance'
-                                    ).value
-                                "
-                            >
-                                {{
-                                    signUpForm.get(
-                                        "step1.dateNaissance"
-                                    ).value | date : "longDate"
-                                }}
-                            </ng-container>
-                            <ng-container
-                                *ngIf="
-                                    !signUpForm.get(
-                                        'step1.dateNaissance'
-                                    ).value
-                                "
-                                >Not set</ng-container
-                            >
-                        </span>
-                        <mat-form-field
-                            class="fuse-mat-dense invisible absolute inset-0 -mt-2.5 opacity-0 pointer-events-none"
-                            [subscriptSizing]="'dynamic'"
-                        >
-                            <input
-                                matInput
-                                [formControlName]="'dateNaissance'"
-                                [matDatepicker]="dueDatePicker"
-                               
-                            />
-                            <mat-datepicker #dueDatePicker>
-                                <mat-datepicker-actions>
-                                    <button
-                                        mat-button
-                                        (click)="
-                                            signUpForm
-                                                .get(
-                                                    'step1.dateNaissance'
-                                                )
-                                                .setValue(null)
-                                        "
-                                        matDatepickerCancel
-                                    >
-                                        Clear
-                                    </button>
-                                    <button
-                                        class=""
-                                        mat-flat-button
-                                        [color]="'primary'"
-                                        matDatepickerApply
-                                    >
-                                        Select
-                                    </button>
-                                </mat-datepicker-actions>
-                            </mat-datepicker>
-                        </mat-form-field>
-                    </div>
-
+                   
                       <!-- button next -->
                     <div class="flex justify-end">
                         <button
@@ -228,104 +149,11 @@
                 </mat-step>
 
                 <mat-step
-                    [formGroupName]="'address'"
-                    [stepControl]="signUpForm.get('address')"
-                    #verticalStepperStep2>
-                    <ng-template matStepLabel>Adress</ng-template>
-                    <p class="my-6 font-medium">
-                        Please specify you exact adress for verification
-                    </p>
-                    <div class="flex flex-col gt-xs:flex-row">
-                        <mat-form-field class="flex">
-                            <mat-select
-                            [formControlName]="'pays'"
-                            placeholder="Choose your Country"
-                                required
-                            >
-                                <mat-option *ngFor="let country of countries" [value]="country.name.common">
-                                    {{ country.name.common }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_outline:tag'"
-                            ></mat-icon>
-                        </mat-form-field>
-                        <mat-form-field class="flex-auto gt-xs:pl-3">
-                            <input
-                                matInput
-                                [formControlName]="'ville'"
-                                [placeholder]="'City'"
-                                required>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_outline:location-marker'"></mat-icon>
-                                <mat-error *ngIf="signUpForm.get('address.ville').hasError('required')">City is required</mat-error>
-                                <mat-error *ngIf="signUpForm.get('address.ville').hasError('minlength')">City should be at least 3 characters long</mat-error>
-                                <mat-error *ngIf="signUpForm.get('address.ville').hasError('invalidFormat')">Invalid City name</mat-error>
-                        </mat-form-field>
-                    </div>
-                    <div class="flex">
-                        <mat-form-field class="flex-auto">
-                            <input
-                                matInput
-                                [formControlName]="'codePostale'"
-                                [placeholder]="'Postal code'"
-                                required>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_outline:mail-open'"></mat-icon>
-                                <mat-error *ngIf="signUpForm.get('address.codePostale').hasError('required')">Postal code is required</mat-error>
-                                <mat-error *ngIf="signUpForm.get('address.codePostale').hasError('invalidFormat')">Postal code should contain only numbers</mat-error>
-                                <mat-error *ngIf="signUpForm.get('address.codePostale').hasError('invalidLength')">Postal code should be exactly 4 digits long</mat-error>
-                        </mat-form-field>
-                    </div>
-                    <div class="flex">
-                        <mat-form-field class="flex-auto">
-                            <input
-                                matInput
-                                [formControlName]="'numRue'"
-                                [placeholder]="'Street number'"
-                                >
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_outline:chevron-up'"></mat-icon>
-                                <mat-error *ngIf="signUpForm.get('address.numRue').hasError('required')">Street number is required</mat-error>
-                                <mat-error *ngIf="signUpForm.get('address.numRue').hasError('invalidLength')">Street number should be exactly 2 digits long</mat-error>
-                                <mat-error *ngIf="!signUpForm.get('address.numRue').hasError('required')&&signUpForm.get('address.numRue').hasError('invalidFormat')">Street number should contain only numbers</mat-error>
-                            </mat-form-field>
-                    </div>
-                    <div class="mt-4 flex justify-end">
-                        <button
-                            class="px-8 mr-2"
-                            mat-flat-button
-                            [color]="'accent'"
-                            type="button"
-                            matStepperPrevious>
-                            Back
-                        </button>
-                        <button
-                            class="px-8"
-                            mat-flat-button
-                            [color]="'primary'"
-                            [disabled]="verticalStepperStep2.stepControl.pristine || verticalStepperStep2.stepControl.invalid"
-                            type="button"
-                            matStepperNext>
-                            Next
-                        </button>
-                    </div>
-                </mat-step>
-
-                <mat-step
-                    [formGroupName]="'step3'"
-                    [stepControl]="signUpForm.get('step3')"
-                    #verticalStepperStep3>
+                    [formGroupName]="'step2'"
+                    [stepControl]="signUpForm.get('step2')"
+                    #verticalStepperstep2>
                     <ng-template matStepLabel>Security</ng-template>
-                    <p class="my-3 mb-2 font-medium">
+                    <p class="my-3 mb-4 font-bold">
                         Here we you will add the information related to the plateform
                     </p>
                      <!-- password -->
@@ -334,7 +162,7 @@
                                 <input
                                     matInput
                                     type="password"
-                                    [formControlName]="'motDePasse'"
+                                    [formControlName]="'password'"
                                     placeholder="Password"
                                     #passwordField>
                                 <button
@@ -351,11 +179,11 @@
                                         *ngIf="passwordField.type === 'text'"
                                         [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
                                 </button>
-                                <mat-error *ngIf="signUpForm.get('step3.motDePasse').errors?.required">Password is required</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step3.motDePasse').errors?.missingNumber && !signUpForm.get('step3.motDePasse').errors?.required">Password must contain at least one number</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step3.motDePasse').errors?.missingSpecialChar && !signUpForm.get('step3.motDePasse').errors?.required && !signUpForm.get('step3.motDePasse').errors?.missingNumber"> at least one special character</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step3.motDePasse').errors?.minLength && !signUpForm.get('step3.motDePasse').errors?.required && !signUpForm.get('step3.motDePasse').errors?.missingNumber && !signUpForm.get('step3.motDePasse').errors?.missingSpecialChar">at least 8 characters long</mat-error>
-                                <mat-error *ngIf="signUpForm.get('step3.motDePasse').errors?.missingUpperCase && !signUpForm.get('step3.motDePasse').errors?.missingNumber&& !signUpForm.get('step3.motDePasse').errors?.missingSpecialChar && !signUpForm.get('step3.motDePasse').errors?.required">Password must contain at least one uppercase character</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step2.password').errors?.required">Password is required</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step2.password').errors?.missingNumber && !signUpForm.get('step2.motDePasse').errors?.required">Password must contain at least one number</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step2.password').errors?.missingSpecialChar && !signUpForm.get('step2.motDePasse').errors?.required && !signUpForm.get('step2.motDePasse').errors?.missingNumber"> at least one special character</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step2.password').errors?.minLength && !signUpForm.get('step2.motDePasse').errors?.required && !signUpForm.get('step2.motDePasse').errors?.missingNumber && !signUpForm.get('step2.motDePasse').errors?.missingSpecialChar">at least 8 characters long</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step2.password').errors?.missingUpperCase && !signUpForm.get('step2.motDePasse').errors?.missingNumber&& !signUpForm.get('step2.motDePasse').errors?.missingSpecialChar && !signUpForm.get('step2.motDePasse').errors?.required">Password must contain at least one uppercase character</mat-error>
                             </mat-form-field>
                     </div>
 
@@ -376,23 +204,7 @@
                         ></mat-icon>
                     </mat-form-field>
                     
-                    <mat-form-field class="flex">
-                        <mat-select
-                            [formControlName]="'poste'"
-                            placeholder="Choose your Title"
-                            required
-                        >
-                            <mat-option *ngFor="let poste of userPosteValues" [value]="poste">
-                                {{ poste.replace('_', ' ') | titlecase }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-icon
-                            class="icon-size-5"
-                            matPrefix
-                            [svgIcon]="'heroicons_outline:users'"
-                        ></mat-icon>
-                    </mat-form-field>
-
+                     <!-- hiringDate -->
                     <div class="font-medium">Hiring Date</div>
                     <div
                         class="relative flex items-center mt-1.5 px-4 leading-9 rounded-full cursor-pointer text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700"
@@ -406,20 +218,20 @@
                             <ng-container
                                 *ngIf="
                                     signUpForm.get(
-                                        'step3.dateEmbauche'
+                                        'step2.hiringDate'
                                     ).value
                                 "
                             >
                                 {{
                                     signUpForm.get(
-                                        "step3.dateEmbauche"
+                                        "step2.hiringDate"
                                     ).value | date : "longDate"
                                 }}
                             </ng-container>
                             <ng-container
                                 *ngIf="
                                     !signUpForm.get(
-                                        'step3.dateEmbauche'
+                                        'step2.hiringDate'
                                     ).value
                                 "
                                 >Not set</ng-container
@@ -431,8 +243,10 @@
                         >
                             <input
                                 matInput
-                                [formControlName]="'dateEmbauche'"
+                                [formControlName]="'hiringDate'"
                                 [matDatepicker]="hiringDatePicker"
+                                [max]="maxDate"
+                                [min]="minDate"
                             />
                             <mat-datepicker #hiringDatePicker>
                                 <mat-datepicker-actions>
@@ -441,11 +255,12 @@
                                         (click)="
                                             signUpForm
                                                 .get(
-                                                    'step3.dateEmbauche'
+                                                    'step2.hiringDate'
                                                 )
                                                 .setValue(null)
                                         "
                                         matDatepickerCancel
+                                        
                                     >
                                         Clear
                                     </button>
@@ -461,6 +276,7 @@
                             </mat-datepicker>
                         </mat-form-field>
                     </div>
+                    
                     <div class="flex justify-end mt-8">
                         <button
                             class="px-8 mr-2"
@@ -471,48 +287,83 @@
                             Back
                         </button>
                         <button
+                            *ngIf="displayAlternateOption"
                             class="px-8"
                             mat-flat-button
                             [color]="'primary'"
                             type="button"
-                            [disabled]="verticalStepperStep3.stepControl.pristine || verticalStepperStep3.stepControl.invalid"
+                            [disabled]="verticalStepperstep2.stepControl.pristine || verticalStepperstep2.stepControl.invalid"
                             matStepperNext>
                             Next
                         </button>
+                        <button
+                        *ngIf="!displayAlternateOption"
+                        (click)="signUp()"
+                         class="px-8"
+                         mat-flat-button
+                         [color]="'primary'"
+                         type="button"
+                         [disabled]="verticalStepperstep2.stepControl.pristine || verticalStepperstep2.stepControl.invalid"
+                         matStepperNext>
+                         Next
+                     </button>
                     </div>
                 </mat-step>
 
                 <mat-step
-                [formGroupName]="'step4'"
-                [stepControl]="signUpForm.get('step4')"
-                #verticalStepperStep4>
-                <ng-template matStepLabel>Step 4: Avatar Upload</ng-template>
-                <p class="my-6 font-medium">
-                    One last thing, Please Upload your profile picture here.
+                *ngIf="displayAlternateOption"
+                [formGroupName]="'step3'"
+                [stepControl]="signUpForm.get('step3')"
+                #verticalStepperstep3>
+                <ng-template matStepLabel>Study schedule</ng-template>
+                <p class="my-6 font-bold">
+                    One last thing, Please provide us with study schedule
                 </p>
-                <!-- Avatar Upload Button -->
-                <div class="flex">
-                    <div class="mt-4 ">
-                        <!-- Hidden input for file upload -->
-                        <input 
-                        [formControlName]="'avatar'"
-                        type="file"
-                        #fileInput 
-                        (change)="onFileChange($event)" 
-                        style="display: none">
-                        <!-- Upload button -->
-                        <button 
-                        class="flex-row"
-                        mat-flat-button 
-                        [color]="signUpForm.get('step4.avatar').value ? 'accent' : 'primary'"
-                        (click)="fileInput.click()">
-                            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                            <span class="font-medium ml-2 mr-1">{{ signUpForm.get('step4.avatar').value && isImageFileValid ? 'Picture Uploaded' : 'Upload Profile picture' }}</span>
-                            
-                        </button>
-                    </div>
+                <!-- weeks of the month  -->
+                <div 
+                class="flex flex-col mt-2 mb-3 gt-sm:mt-0 gt-sm:ml-16">
+                    <span class="font-medium mb-2">Studying weeks for each</span>
+                    <mat-radio-group
+                        [formControlName]="'isTwoFirstWeek'"
+                        class="flex flex-row" 
+                        [color]="'primary'"
+                        [value]="'just-good'">
+                        <mat-radio-button
+                            class="mr-4" 
+                            [value]="true">
+                            First Two Weeks
+                        </mat-radio-button>
+                        <mat-radio-button
+                            [value]="false">
+                            Last Two Weeks
+                        </mat-radio-button>
+                    </mat-radio-group>
                 </div>
-            
+
+                     <!-- Study Days -->
+                 <div class="flex"> 
+                        <mat-form-field class="flex-auto gt-xs:pr-3">
+                            <mat-select
+                                [formControlName]="'daysOfStudy'"
+                                [placeholder]="'Choose the 2 study days '"
+                                multiple
+                                required>
+                                <mat-option *ngFor="let day of daysOfWeek" [value]="day.value">
+                                    {{ day.viewValue }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="
+                                    'heroicons_outline:chevron-double-right'
+                                "
+                            ></mat-icon>
+                            <mat-error *ngIf="signUpForm.get('step3.daysOfStudy').hasError('required')">Please choose study days</mat-error>
+                            <mat-error *ngIf="signUpForm.get('step3.daysOfStudy').hasError('twoDays') && !signUpForm.get('step3.daysOfStudy').hasError('required')">You must select exactly two days.</mat-error>
+                            
+                        </mat-form-field>
+                       </div>           
                 <!-- Next and Previous buttons -->
                 <div class="flex justify-end mt-8">
                     <button
@@ -529,14 +380,20 @@
                         mat-flat-button
                         [color]="'primary'"
                         type="button"
-                        [disabled]="isImageUploaded || verticalStepperStep4.stepControl.pristine || verticalStepperStep4.stepControl.invalid"
+                        [disabled]="verticalStepperstep3.stepControl.pristine || verticalStepperstep3.stepControl.invalid"
                         matStepperNext>
                         Next
                     </button>
                 </div>
             </mat-step>
-            
             </mat-horizontal-stepper>
+            <div class="flex items-baseline mt-0.5 font-medium">
+                <div>Already have an account?</div>
+                <a
+                    class="ml-1 text-primary-500 hover:underline"
+                    [routerLink]="['/sign-in']">Sign in
+                </a>
+            </div>
         </form>
         </div>
     </div>

@@ -175,10 +175,10 @@ export class AuthService
      *
      * @param user
      */
-    signUp(user: { name: string; email: string; password: string; company: string }): Observable<any>
-    {
-        return this._httpClient.post('api/auth/sign-up', user);
+    signUp(user: User): Observable<any> {
+        return this._httpClient.post<any>(`${this._authApiUrl}/registerUser`, user);
     }
+
 
     /**
      * Unlock session
@@ -234,5 +234,13 @@ export class AuthService
                 })
             );
           
+    }
+
+    /**
+     * returns user object if the sopra id or the email exists
+     * 
+     */
+    getEmailOrSopraID(value: string): Observable<User> {
+        return this._httpClient.get<any>(`${this._authApiUrl}/getEmailOrSopraID/${value}`)
     }
 }
