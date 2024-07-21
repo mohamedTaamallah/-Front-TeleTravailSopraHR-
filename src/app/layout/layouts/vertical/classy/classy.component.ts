@@ -5,8 +5,8 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
 import { NavigationService } from 'app/core/navigation/navigation.service';
-import { User } from 'app/core/user/user.types';
 import { UserService } from 'app/core/user/user.service';
+import { User } from 'app/core/entities/User';
 
 @Component({
     selector     : 'classy-layout',
@@ -63,12 +63,12 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy
             });
 
         // Subscribe to the user service
-        this._userService.user$
-            .pipe((takeUntil(this._unsubscribeAll)))
-            .subscribe((user: User) => {
-                this.user = user;
-            });
+        this._userService.get().subscribe((user: User) => {
+            // Assign the emitted user object to the local variable
+            this.user = user;
+            console.log(this.user)
 
+        });        
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -77,6 +77,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy
                 // Check if the screen is small
                 this.isScreenSmall = !matchingAliases.includes('md');
             });
+
     }
 
     /**
@@ -109,4 +110,6 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy
             navigation.toggle();
         }
     }
+
+    
 }

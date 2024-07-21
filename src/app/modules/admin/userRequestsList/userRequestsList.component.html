@@ -1,11 +1,86 @@
 <div class="flex flex-col flex-auto min-w-0">
-
     <!-- Main -->
     <div class="flex-auto p-6 sm:p-10">
-
         <!-- CONTENT GOES HERE -->
-        <div class="h-400 min-h-400 max-h-400 border-2 border-dashed border-gray-300 rounded-2xl"></div>
-
+        <div
+            class="h-150 min-h-50 max-h-300 border-2 rounded-2xl">
+            <ejs-grid
+                #grid
+                class="border-2 rounded-2xl"
+                [dataSource]="data"
+                height="400"
+                [allowFiltering]="true"
+                [filterSettings]="filterSettings"
+                [editSettings]="editSettings"
+                [toolbar]='toolbarOptions'
+                [allowPaging]="true"
+                [pageSettings]="PageSettings"
+                (beforePrint)='beforePrint($event)'
+             >
+                <e-columns>
+                    <e-column
+                        field="SopraID"
+                        headerText="Sopra ID"
+                        width="120"
+                        textAlign="Right"
+                        isPrimaryKey="true"
+                        [validationRules]="orderidrules"
+                    ></e-column>
+                    <e-column
+                        field="fullName"
+                        headerText="Full user name"
+                        width="150"
+                        [validationRules]="customeridrules"
+                    ></e-column>
+                    <e-column
+                        field="email"
+                        headerText="User Email"
+                        width="130"
+                        format="yMd"
+                        textAlign="left"
+                    ></e-column>
+                    <e-column
+                        field="phoneNumber"
+                        headerText="Phone Number"
+                        width="130"
+                        format="yMd"
+                        textAlign="center"
+                    ></e-column>
+                    <e-column
+                        field="Role"
+                        headerText="Requested Role"
+                        width="150"
+                        editType="dropdownedit"
+                    ></e-column>
+                    <e-column
+                        field="Team"
+                        headerText="Team"
+                        width="150"
+                        editType="dropdownedit"
+                    ></e-column>
+                    <e-column
+                    field="userStatus"
+                    headerText="Status"
+                    width="150"
+                    editType="dropdownedit"
+                ></e-column>
+                </e-columns>
+                <ng-template >
+                    <div *ngIf="isEmpty;" class="flex flex-col items-center">
+                        <img
+                            [src]="
+                                './assets/images/flags/emptyRecordTemplate_light.svg'
+                            "
+                            class="e-emptyRecord w-24"
+                            alt="No record"
+                        />
+                        <span class="mt-2"
+                            >There is no data available to display at the
+                            moment.</span
+                        >
+                    </div>
+                </ng-template>
+            </ejs-grid>
+        </div>
     </div>
-
 </div>
