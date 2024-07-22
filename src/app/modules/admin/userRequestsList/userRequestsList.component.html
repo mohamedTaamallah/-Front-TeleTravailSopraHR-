@@ -2,8 +2,7 @@
     <!-- Main -->
     <div class="flex-auto p-6 sm:p-10">
         <!-- CONTENT GOES HERE -->
-        <div
-            class="h-150 min-h-50 max-h-300 border-2 rounded-2xl">
+        <div class="h-150 min-h-50 max-h-300 border-2 rounded-2xl">
             <ejs-grid
                 #grid
                 class="border-2 rounded-2xl"
@@ -16,13 +15,15 @@
                 [allowPaging]="true"
                 [pageSettings]="PageSettings"
                 (beforePrint)='beforePrint($event)'
-             >
+                (actionBegin)="onActionBegin($event)"
+
+            >
                 <e-columns>
                     <e-column
                         field="SopraID"
                         headerText="Sopra ID"
                         width="120"
-                        textAlign="Right"
+                        textAlign="center"
                         isPrimaryKey="true"
                         [validationRules]="orderidrules"
                     ></e-column>
@@ -30,24 +31,27 @@
                         field="fullName"
                         headerText="Full user name"
                         width="150"
+                        isPrimaryKey="true"
                         [validationRules]="customeridrules"
-                    ></e-column>
+                    >
+                </e-column>
                     <e-column
                         field="email"
                         headerText="User Email"
-                        width="130"
+                        width="150"
                         format="yMd"
                         textAlign="left"
+                        isPrimaryKey="true"
                     ></e-column>
                     <e-column
                         field="phoneNumber"
                         headerText="Phone Number"
-                        width="130"
-                        format="yMd"
+                        width="120"
                         textAlign="center"
+                        isPrimaryKey="true"
                     ></e-column>
                     <e-column
-                        field="Role"
+                        field="role"
                         headerText="Requested Role"
                         width="150"
                         editType="dropdownedit"
@@ -59,11 +63,24 @@
                         editType="dropdownedit"
                     ></e-column>
                     <e-column
-                    field="userStatus"
-                    headerText="Status"
-                    width="150"
-                    editType="dropdownedit"
-                ></e-column>
+                        field="userStatus"
+                        headerText="Status"
+                        width="150"
+                        editType="dropdownedit"
+                    >
+                        <ng-template #template let-data>
+                            <span
+                                class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase"
+                                [ngClass]="{
+                                    'bg-amber-200 text-amber-800 dark:bg-amber-600 dark:text-amber-50': data.userStatus === 'PENDING',
+                                    'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': data.userStatus === 'ACTIVE'
+                                }"
+                            >
+                                <span class="leading-relaxed whitespace-nowrap">{{ data.userStatus }}</span>
+                            </span>
+                        </ng-template>
+
+                    </e-column>
                 </e-columns>
                 <ng-template >
                     <div *ngIf="isEmpty;" class="flex flex-col items-center">
