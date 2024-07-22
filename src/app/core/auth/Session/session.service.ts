@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Team } from 'app/core/entities/Team';
 import { User } from 'app/core/entities/User';
 
 @Injectable({
@@ -34,4 +35,16 @@ export class SessionService {
         const value = sessionStorage.getItem(key);
         return value ? JSON.parse(value) : null;
     }
+
+    saveAllTeams(Teams: Team []): any {
+        return sessionStorage.setItem('teams', JSON.stringify(Teams));
+    }
+
+  // Get the list of teams from sessionStorage
+  getTeams(): Team[] | null {
+    const teamString = sessionStorage.getItem('teams');
+    return teamString ? JSON.parse(teamString) : null;
+  }
+
+
 }

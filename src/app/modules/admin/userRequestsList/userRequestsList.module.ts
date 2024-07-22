@@ -29,6 +29,6 @@ const exampleRoutes: Route[] = [
         EditService
         ],
 })
-export class ExampleModule
+export class  UserRequestsListModule
 {
 }

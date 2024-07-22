@@ -10,6 +10,9 @@ import { AdminService } from 'app/core/services/admin/admin.service';
 import { delay } from 'rxjs/operators';
 import { createElement } from '@syncfusion/ej2-base';
 import { AffectRoleStatusRequest } from 'app/core/entities/AffectRoleStatusRequest';
+import { SessionService } from 'app/core/auth/Session/session.service';
+import { UserWithTeamDTO } from 'app/core/entities/UserWithTeamDTO';
+import { Team } from 'app/core/entities/Team';
 
 @Component({
     selector: 'example',
@@ -17,7 +20,7 @@ import { AffectRoleStatusRequest } from 'app/core/entities/AffectRoleStatusReque
     encapsulation: ViewEncapsulation.None,
 })
 export class userRequestsListComponent {
-    public data: User[] = [];
+    public data: UserWithTeamDTO [] = [];
     public filterSettings: Object;
     public toolbarOptions: string[];
     public orderidrules: Object;
@@ -26,17 +29,20 @@ export class userRequestsListComponent {
     public PageSettings: Object;
     public editSettings?: EditSettingsModel;
     public editparams: Object;
+    private Teams : Team []
 
     @ViewChild('grid') public grid?: GridComponent;
 
     /**
      * Constructor
      */
-    constructor(private adminService: AdminService) {}
+    constructor(private adminService: AdminService, private _sessionService : SessionService) {}
 
     ngOnInit(): void {
         //getting all the pending users request
         this.getListPendingUsers();
+        //getting all the teams 
+        this.Teams = this._sessionService.getTeams()
 
         this.filterSettings = { type: 'Excel' };
         this.toolbarOptions = ['Search', 'Print', 'Update'];
@@ -51,7 +57,7 @@ export class userRequestsListComponent {
 
     getListPendingUsers() {
         this.adminService.getPendingUsersRequests().subscribe(
-            (users: User[]) => {
+            (users: UserWithTeamDTO []) => {
                 this.data = users;
             },
             (error) => {
@@ -59,18 +65,20 @@ export class userRequestsListComponent {
                 console.error('Error fetching pending users:', error);
             }
         );
+        this.addTeamsToUsers()
     }
 
     // this method handle the update for each user changed
     onActionBegin(args: ActionEventArgs) {
         if (args.requestType === 'save') {
             // args.data contains the updated data
-            const updatedData: User = args.data as User;
-            console.log('Data to be updated:', updatedData);
+            const updatedData: UserWithTeamDTO = args.data as UserWithTeamDTO ;
+            console.log('Data to be updated:', updatedData.user);
+            const user : User = updatedData.user
             const affectRoleStatusRequest = new AffectRoleStatusRequest(
-                updatedData.idUser,
-                updatedData.role,
-                updatedData.userStatus
+                user.idUser,
+                user.role,
+                user.userStatus
             );
             this.adminService
                 .affectRoleAndChangeStatus(affectRoleStatusRequest)
@@ -88,6 +96,18 @@ export class userRequestsListComponent {
                 });
         }
     }
+
+      // Add teams to the UserWithTeamDTO array
+  addTeamsToUsers(): void {
+    this.data.forEach(userWithTeam => {
+      // Find the team that matches the user’s team ID
+      const team = this.Teams.find(t => t.idTeam === userWithTeam.user.userTeam.idTeam);
+      if (team) {
+        userWithTeam.team = team;  // Update the team in the UserWithTeamDTO
+      }
+    });
+    console.log('Updated UserWithTeamDTO data:', this.data);
+  }
 
     
     // -----------------------------------------------------------------------------------------------------
@@ -111,6 +131,7 @@ export class userRequestsListComponent {
                 .appendChild(tbody);
         }
     }
+
 }
 
 interface CustomElement extends Element {

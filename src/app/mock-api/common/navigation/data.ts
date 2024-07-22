@@ -34,13 +34,13 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         title: 'Pending user Requests',
         type : 'basic',
         icon : 'heroicons_outline:user',
-        link : '/example'
+        link : '/UsersList'
     },
     {
         id   : 'example',
         title: 'Team management ',
         type : 'basic',
         icon : 'heroicons_outline:user-group',
-        link : '/example'
+        link : '/TeamManagment'
     }
 ];

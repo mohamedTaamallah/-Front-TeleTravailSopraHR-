@@ -4,14 +4,11 @@
 
     </div>
 </div> -->
-
-
-
 <div class="flex flex-col flex-auto min-w-0">
     <!-- Main -->
     <div class="flex-auto p-6 sm:p-10">
         <!-- CONTENT GOES HERE -->
-        <div class="mt-4  h-150 min-h-50 max-h-300 border-2 rounded-2xl">
+        <div class="h-150 min-h-50 max-h-300 border-2 rounded-2xl">
             <ejs-grid
                 #grid
                 class="border-2 rounded-2xl"
@@ -24,12 +21,11 @@
                 [allowPaging]="true"
                 [pageSettings]="PageSettings"
                 (beforePrint)='beforePrint($event)'
-                (actionBegin)="onActionBegin($event)"
 
             >
                 <e-columns>
                     <e-column
-                        field="user.SopraID"
+                        field="SopraID"
                         headerText="Sopra ID"
                         width="120"
                         textAlign="center"
@@ -37,7 +33,7 @@
                         [validationRules]="orderidrules"
                     ></e-column>
                     <e-column
-                        field="user.fullName"
+                        field="fullName"
                         headerText="Full user name"
                         width="150"
                         isPrimaryKey="true"
@@ -45,7 +41,7 @@
                     >
                 </e-column>
                     <e-column
-                        field="user.email"
+                        field="email"
                         headerText="User Email"
                         width="150"
                         format="yMd"
@@ -53,26 +49,26 @@
                         isPrimaryKey="true"
                     ></e-column>
                     <e-column
-                        field="user.phoneNumber"
+                        field="phoneNumber"
                         headerText="Phone Number"
                         width="120"
                         textAlign="center"
                         isPrimaryKey="true"
                     ></e-column>
                     <e-column
-                        field="user.role"
+                        field="role"
                         headerText="Requested Role"
                         width="150"
                         editType="dropdownedit"
                     ></e-column>
                     <e-column
-                        field="team.teamName"
+                        field="Team"
                         headerText="Team"
                         width="150"
                         editType="dropdownedit"
                     ></e-column>
                     <e-column
-                        field="user.userStatus"
+                        field="userStatus"
                         headerText="Status"
                         width="150"
                         editType="dropdownedit"
@@ -81,11 +77,11 @@
                             <span
                                 class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase"
                                 [ngClass]="{
-                                    'bg-amber-200 text-amber-800 dark:bg-amber-600 dark:text-amber-50': data.user.userStatus === 'PENDING',
-                                    'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': data.user.userStatus === 'ACTIVE'
+                                    'bg-amber-200 text-amber-800 dark:bg-amber-600 dark:text-amber-50': data.userStatus === 'PENDING',
+                                    'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': data.userStatus === 'ACTIVE'
                                 }"
                             >
-                                <span class="leading-relaxed whitespace-nowrap">{{ data.user.userStatus }}</span>
+                                <span class="leading-relaxed whitespace-nowrap">{{ data.userStatus }}</span>
                             </span>
                         </ng-template>
 
