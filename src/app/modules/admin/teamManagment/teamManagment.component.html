@@ -1,108 +1,88 @@
-<!-- <div class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-    <div class="text-lg font-medium tracking-tight leading-6 truncate">Budget Details</div>
-    <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
-
-    </div>
-</div> -->
 <div class="flex flex-col flex-auto min-w-0">
-    <!-- Main -->
-    <div class="flex-auto p-6 sm:p-10">
-        <!-- CONTENT GOES HERE -->
-        <div class="h-150 min-h-50 max-h-300 border-2 rounded-2xl">
-            <ejs-grid
-                #grid
-                class="border-2 rounded-2xl"
-                [dataSource]="data"
-                height="400"
-                [allowFiltering]="true"
-                [filterSettings]="filterSettings"
-                [editSettings]="editSettings"
-                [toolbar]='toolbarOptions'
-                [allowPaging]="true"
-                [pageSettings]="PageSettings"
-                (beforePrint)='beforePrint($event)'
+  <!-- Main -->
+  <div class="flex-auto p-6 sm:p-10">
+    <!-- CONTENT GOES HERE -->
+    <div>
+      <!-- Recent transactions table -->
+      <div class="xl:col-span-2 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+        <div class="p-6">
+          <div class="mr-4 text-lg font-large tracking-tight leading-6 truncate">Team Managment List
 
-            >
-                <e-columns>
-                    <e-column
-                        field="SopraID"
-                        headerText="Sopra ID"
-                        width="120"
-                        textAlign="center"
-                        isPrimaryKey="true"
-                        [validationRules]="orderidrules"
-                    ></e-column>
-                    <e-column
-                        field="fullName"
-                        headerText="Full user name"
-                        width="150"
-                        isPrimaryKey="true"
-                        [validationRules]="customeridrules"
-                    >
-                </e-column>
-                    <e-column
-                        field="email"
-                        headerText="User Email"
-                        width="150"
-                        format="yMd"
-                        textAlign="left"
-                        isPrimaryKey="true"
-                    ></e-column>
-                    <e-column
-                        field="phoneNumber"
-                        headerText="Phone Number"
-                        width="120"
-                        textAlign="center"
-                        isPrimaryKey="true"
-                    ></e-column>
-                    <e-column
-                        field="role"
-                        headerText="Requested Role"
-                        width="150"
-                        editType="dropdownedit"
-                    ></e-column>
-                    <e-column
-                        field="Team"
-                        headerText="Team"
-                        width="150"
-                        editType="dropdownedit"
-                    ></e-column>
-                    <e-column
-                        field="userStatus"
-                        headerText="Status"
-                        width="150"
-                        editType="dropdownedit"
-                    >
-                        <ng-template #template let-data>
-                            <span
-                                class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase"
-                                [ngClass]="{
-                                    'bg-amber-200 text-amber-800 dark:bg-amber-600 dark:text-amber-50': data.userStatus === 'PENDING',
-                                    'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': data.userStatus === 'ACTIVE'
-                                }"
-                            >
-                                <span class="leading-relaxed whitespace-nowrap">{{ data.userStatus }}</span>
-                            </span>
-                        </ng-template>
-
-                    </e-column>
-                </e-columns>
-                <ng-template >
-                    <div *ngIf="isEmpty;" class="flex flex-col items-center">
-                        <img
-                            [src]="
-                                './assets/images/flags/emptyRecordTemplate_light.svg'
-                            "
-                            class="e-emptyRecord w-24"
-                            alt="No record"
-                        />
-                        <span class="mt-2"
-                            >There is no data available to display at the
-                            moment.</span
-                        >
-                    </div>
-                </ng-template>
-            </ejs-grid>
+          </div>
+          <div class="text-secondary font-medium">{{TeamNumbers}} Teams available
+          
+            <mat-form-field style="margin-left:700px;"
+            class="w-full  w-72 "
+            [subscriptSizing]="'dynamic'">
+            <mat-icon
+                matPrefix
+                class="icon-size-1"
+                [svgIcon]="'heroicons_solid:search'"></mat-icon>
+            <input
+                (keyup)="applyFilter($event.target.value)"
+                placeholder="Search by Team"
+                matInput
+                #query>
+        </mat-form-field></div> 
+          
         </div>
+
+        <div class="overflow-x-auto mx-6">
+          <table class="w-full bg-transparent" mat-table matSort [dataSource]="dataSource">
+            <!-- Name -->
+            <ng-container matColumnDef="teamName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Team</th>
+              <td mat-cell *matCellDef="let team">{{ team.teamName }}</td>
+            </ng-container>
+            <!-- Email -->
+            <ng-container matColumnDef="Descritption">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by number">Description</th>
+              <td mat-cell *matCellDef="let team">{{ team.description }}</td>
+            </ng-container>
+            <!-- Requested Role -->
+            <ng-container matColumnDef="OnsiteEmployees">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>On site Employees</th>
+              <td mat-cell *matCellDef="let team">{{ team.onsiteEmployees}}</td>
+            </ng-container>
+            <!-- Requested Role -->
+            <ng-container matColumnDef="Manager">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Current Manager</th>
+              <td mat-cell *matCellDef="let team">{{ team.manager.fullName}}</td>
+            </ng-container>     
+            
+            
+            <!-- Affected Role -->
+            <!-- <ng-container matColumnDef="Manager">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Manger</th>
+              <td mat-cell *matCellDef="let request">
+                <mat-select [(ngModel)]="request.role" class="form-select">
+                  <mat-option *ngFor="let role of userRoleValues" [value]="role">{{ role.replace('_', ' ') | titlecase }}</mat-option>
+                </mat-select>
+              </td>
+            </ng-container> -->
+
+            
+            <!-- Confirmation -->
+            <ng-container matColumnDef="Edit">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Edit</th>
+              <td mat-cell *matCellDef="let user">
+                <button mat-icon-button aria-label="Approve" (click)="openConfirmationDialog(user,'APPROVED')">
+                  <mat-icon  svgIcon="heroicons_outline:pencil"></mat-icon>
+                </button>
+              </td>
+            </ng-container>
+            <!-- Footer -->
+            <ng-container matColumnDef="recentOrdersTableFooter">
+              <td class="py-6 px-0 border-0" mat-footer-cell *matFooterCellDef colspan="6">
+                <button mat-stroked-button>+ Add a new Team </button>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="pendingUserRequestColumns"></tr>
+            <tr class="order-row h-16" mat-row *matRowDef="let row; columns: pendingUserRequestColumns;"></tr>
+            <tr class="h-16 border-0" mat-footer-row *matFooterRowDef="['recentOrdersTableFooter']"></tr>
+          </table>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

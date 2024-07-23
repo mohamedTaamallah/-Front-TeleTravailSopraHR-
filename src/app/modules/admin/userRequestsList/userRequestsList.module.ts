@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import {  userRequestsListComponent } from 'app/modules/admin/userRequestsList/userRequestsList.component';
 // import the GridModule for the Grid component
-import { GridModule, Filter, Sort, FilterService, ToolbarService, PageService,PrintEventArgs, EditService } from '@syncfusion/ej2-angular-grids';
+import { GridModule, Filter, Sort, FilterService, ToolbarService, PageService,PrintEventArgs, EditService, ForeignKeyService } from '@syncfusion/ej2-angular-grids';
 import { CommonModule } from '@angular/common';
 
 const exampleRoutes: Route[] = [
@@ -26,7 +26,8 @@ const exampleRoutes: Route[] = [
         FilterService,
         ToolbarService,
         PageService,
-        EditService
+        EditService,
+        ForeignKeyService
         ],
 })
 export class  UserRequestsListModule

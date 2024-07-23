@@ -4,6 +4,7 @@ import {
     EditSettingsModel,
     GridComponent,
     PrintEventArgs,
+    QueryCellInfoEventArgs,
 } from '@syncfusion/ej2-angular-grids';
 import { User } from 'app/core/entities/User';
 import { AdminService } from 'app/core/services/admin/admin.service';
@@ -20,7 +21,7 @@ import { Team } from 'app/core/entities/Team';
     encapsulation: ViewEncapsulation.None,
 })
 export class userRequestsListComponent {
-    public data: UserWithTeamDTO [] = [];
+    public data: UserWithTeamDTO[] = [];
     public filterSettings: Object;
     public toolbarOptions: string[];
     public orderidrules: Object;
@@ -29,20 +30,23 @@ export class userRequestsListComponent {
     public PageSettings: Object;
     public editSettings?: EditSettingsModel;
     public editparams: Object;
-    private Teams : Team []
+    public Teams: Team[];
+public teamParams: Object;
 
     @ViewChild('grid') public grid?: GridComponent;
 
     /**
      * Constructor
      */
-    constructor(private adminService: AdminService, private _sessionService : SessionService) {}
+    constructor(
+        private adminService: AdminService,
+    ) {}
 
     ngOnInit(): void {
+
+
         //getting all the pending users request
         this.getListPendingUsers();
-        //getting all the teams 
-        this.Teams = this._sessionService.getTeams()
 
         this.filterSettings = { type: 'Excel' };
         this.toolbarOptions = ['Search', 'Print', 'Update'];
@@ -57,24 +61,25 @@ export class userRequestsListComponent {
 
     getListPendingUsers() {
         this.adminService.getPendingUsersRequests().subscribe(
-            (users: UserWithTeamDTO []) => {
+            (users: UserWithTeamDTO[]) => {
                 this.data = users;
             },
             (error) => {
                 // Handle error, e.g., log it or show a user-friendly message
                 console.error('Error fetching pending users:', error);
             }
+        
         );
-        this.addTeamsToUsers()
+        console.log(this.Teams)
     }
 
     // this method handle the update for each user changed
     onActionBegin(args: ActionEventArgs) {
         if (args.requestType === 'save') {
             // args.data contains the updated data
-            const updatedData: UserWithTeamDTO = args.data as UserWithTeamDTO ;
+            const updatedData: UserWithTeamDTO = args.data as UserWithTeamDTO;
             console.log('Data to be updated:', updatedData.user);
-            const user : User = updatedData.user
+            const user: User = updatedData.user;
             const affectRoleStatusRequest = new AffectRoleStatusRequest(
                 user.idUser,
                 user.role,
@@ -96,20 +101,6 @@ export class userRequestsListComponent {
                 });
         }
     }
-
-      // Add teams to the UserWithTeamDTO array
-  addTeamsToUsers(): void {
-    this.data.forEach(userWithTeam => {
-      // Find the team that matches the user’s team ID
-      const team = this.Teams.find(t => t.idTeam === userWithTeam.user.userTeam.idTeam);
-      if (team) {
-        userWithTeam.team = team;  // Update the team in the UserWithTeamDTO
-      }
-    });
-    console.log('Updated UserWithTeamDTO data:', this.data);
-  }
-
-    
     // -----------------------------------------------------------------------------------------------------
     // @ Table params  methods
     // -----------------------------------------------------------------------------------------------------
@@ -132,6 +123,15 @@ export class userRequestsListComponent {
         }
     }
 
+    onDataBound(): void {
+        const gridInstance = this.grid as GridComponent;
+        const dataSource = gridInstance.dataSource as UserWithTeamDTO[];
+        dataSource.forEach((data: UserWithTeamDTO) => {
+            if (data.user.role === 'COLLABORATOR') {
+                gridInstance.hideColumns('team.teamName');
+            }
+        });
+    }
 }
 
 interface CustomElement extends Element {
