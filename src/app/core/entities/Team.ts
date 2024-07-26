@@ -1,5 +1,5 @@
-import { User } from "../user/user.types";
 import { BlockedDay } from "./BlockedDay ";
+import { User } from "./User";
 
 
 export class Team {
@@ -12,4 +12,18 @@ export class Team {
   users?: User[];
   blockedDays?: BlockedDay[];
   manager?: User;
+
+  constructor(
+    idTeam?: number,
+    teamName?: string,
+    description?: string,
+    onsiteEmployees?: number,
+    manager?: User
+  ) {
+    this.idTeam = idTeam;
+    this.teamName = teamName;
+    this.description = description;
+    this.onsiteEmployees = onsiteEmployees;
+    this.manager = manager;
+  }
 }

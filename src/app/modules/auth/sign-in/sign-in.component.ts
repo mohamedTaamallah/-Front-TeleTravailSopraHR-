@@ -84,7 +84,7 @@ export class AuthSignInComponent implements OnInit {
         // Sign in
         // Sign in
         this._authService.signIn(this.signInForm.value).subscribe(
-            () => {
+            (response) => {
                 // Set the redirect url.
                 const redirectURL =
                     this._activatedRoute.snapshot.queryParamMap.get(

@@ -19,15 +19,27 @@ export class AdminService {
   private UserApiUrl: string = environment.UserApiUrl;
   private TeamApiUrl: string = environment.TeamApiUrl;
 
+
+  //Getting all the users 
   getPendingUsersRequests(): Observable<UserWithTeamDTO []> {
     return this.http.get<UserWithTeamDTO []>(`${this.UserApiUrl}/getPendingUsersRequests`)
   }
 
+  //Affect role and change status for users 
   affectRoleAndChangeStatus(affectRoleAndChangeStatus:  AffectRoleStatusRequest): Observable<User> {
     return this.http.put<User>(`${this.UserApiUrl}/affectRoleAndChangeStatus`,affectRoleAndChangeStatus)
   }
 
+  //Getting all the available teams 
   getAllTeams(): Observable<Team []> {
     return this.http.get<Team []>(`${this.TeamApiUrl}/getAllTeams`)
   }
+
+  //Getting all the available managers that still ain't having a team 
+  getAllManagers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.UserApiUrl}/getAllManagers`)
+  }
+
+  updateTeam(team: Team): Observable<Team> {
+    return this.http.put<Team>(`${this.TeamApiUrl}/updateTeam`,Team)  }
 }

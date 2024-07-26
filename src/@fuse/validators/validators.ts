@@ -127,12 +127,18 @@ export class FuseValidators {
      * day of study validators 
      */    
     static exactlyTwoDaysValidator(): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
+        return (control: FormControl): ValidationErrors | null => {
             const selectedDays = control.value;
             return Array.isArray(selectedDays) && selectedDays.length === 2 
                 ? null 
                 : { twoDays: true };
         };
+    }
+    /**
+     * Deep verifier for the changes between the current team and the form 
+     */    
+    static deepEqual(obj1: any, obj2: any): boolean {
+        return JSON.stringify(obj1) === JSON.stringify(obj2);
     }
     
 }

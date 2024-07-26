@@ -11,6 +11,9 @@ import {
     NgForm,
     Validators,
     FormGroup,
+    ValidatorFn,
+    AbstractControl,
+    ValidationErrors,
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
@@ -140,7 +143,7 @@ export class AuthSignUpComponent implements OnInit {
                     .setValidators([Validators.required]);
                 this.signUpForm
                     .get('step3.daysOfStudy')
-                    .setValidators([Validators.required]);
+                    .setValidators([Validators.required,FuseValidators.exactlyTwoDaysValidator()]);
 
                 this.displayAlternateOption = true;
             } else {
@@ -275,4 +278,6 @@ export class AuthSignUpComponent implements OnInit {
         this.maxDate = DateTime.now().toJSDate();
  
     }
+
+
 }
