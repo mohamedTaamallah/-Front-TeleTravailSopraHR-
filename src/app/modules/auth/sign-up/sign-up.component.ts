@@ -100,14 +100,14 @@ export class AuthSignUpComponent implements OnInit {
                     '12121212',
                     [
                         Validators.required,
-                        FuseValidators.lengthFormatValidator(8),
+                        FuseValidators.lengthFormatValidator(8,true),
                     ],
                 ],
                 phoneNumber: [
                     '12121212',
                     [
                         Validators.required,
-                        FuseValidators.lengthFormatValidator(8),
+                        FuseValidators.lengthFormatValidator(8,true),
                     ],
                 ],
                 email: [

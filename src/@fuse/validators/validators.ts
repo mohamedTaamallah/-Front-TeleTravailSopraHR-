@@ -64,7 +64,7 @@ export class FuseValidators {
     /**
      * Validator for the phone and the ncin
      */
-    static lengthFormatValidator(length: number): ValidatorFn {
+    static lengthFormatValidator(length: number,lengthVerifier : boolean): ValidatorFn {
         return (control: AbstractControl): { [key: string]: any } | null => {
             const input = control.value;
             const numericPattern = /^[0-9]*$/;
@@ -73,7 +73,7 @@ export class FuseValidators {
                 return { invalidFormat: true };
             }
 
-            if (input.length !== length) {
+            if (lengthVerifier == true && input.length !== length) {
                 return { invalidLength: true };
             }
 
@@ -134,11 +134,8 @@ export class FuseValidators {
                 : { twoDays: true };
         };
     }
-    /**
-     * Deep verifier for the changes between the current team and the form 
-     */    
-    static deepEqual(obj1: any, obj2: any): boolean {
-        return JSON.stringify(obj1) === JSON.stringify(obj2);
-    }
+
+    
+
     
 }

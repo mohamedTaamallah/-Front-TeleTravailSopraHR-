@@ -4,9 +4,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../../auth/Api/Apis';
 import { JwtTokenService } from '../../auth/JWT/jwt-token.service';
 import { User } from '../../entities/User';
-import { AffectRoleStatusRequest } from 'app/core/entities/AffectRoleStatusRequest';
-import { UserWithTeamDTO } from 'app/core/entities/UserWithTeamDTO';
+import { UserWithTeamDTO } from 'app/core/entities/responses/UserWithTeamDTO';
 import { Team } from 'app/core/entities/Team';
+import { AffectRoleStatusRequest } from 'app/core/entities/requests/AffectRoleStatusRequest';
+import { AllTeamsCountRequest } from 'app/core/entities/responses/AllTeamsCountRequest ';
 
 
 @Injectable({
@@ -31,8 +32,8 @@ export class AdminService {
   }
 
   //Getting all the available teams 
-  getAllTeams(): Observable<Team []> {
-    return this.http.get<Team []>(`${this.TeamApiUrl}/getAllTeams`)
+  getAllTeams(): Observable<AllTeamsCountRequest []> {
+    return this.http.get<AllTeamsCountRequest []>(`${this.TeamApiUrl}/getAllTeams`)
   }
 
   //Getting all the available managers that still ain't having a team 
@@ -41,5 +42,7 @@ export class AdminService {
   }
 
   updateTeam(team: Team): Observable<Team> {
-    return this.http.put<Team>(`${this.TeamApiUrl}/updateTeam`,Team)  }
+    const idManager = team.manager.idUser;
+    return this.http.put<Team>(`${this.TeamApiUrl}/updateTeam/${idManager}`, team);
+  }
 }

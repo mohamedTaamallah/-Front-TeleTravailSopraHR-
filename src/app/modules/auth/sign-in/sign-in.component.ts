@@ -91,9 +91,6 @@ export class AuthSignInComponent implements OnInit {
                         'redirectURL'
                     ) || '/signed-in-redirect';
 
-                // Calling all the users init functions
-                this.admiInit();
-
                 // Navigate to the redirect url
                 this._router.navigateByUrl(redirectURL);
             },
@@ -142,20 +139,5 @@ export class AuthSignInComponent implements OnInit {
     // -----------------------------------------------------------------------------------------------------
     // @ Users methods
     // -----------------------------------------------------------------------------------------------------
-    admiInit() {
-        if (this._sessionService.getUser().role == Role.ADMINISTRATOR) {
-            this._adminService.getAllTeams().subscribe({
-                next: (data: Team[]) => {
-                    this._sessionService.saveAllTeams(data);
-                    console.log(
-                        '***************:',
-                        this._sessionService.getTeams()
-                    );
-                },
-                error: (error) => {
-                    console.error('Error fetching teams:', error);
-                },
-            });
-        }
-    }
+
 }

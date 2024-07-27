@@ -1,4 +1,11 @@
-import { Component, Inject, OnInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+    Component,
+    Inject,
+    OnInit,
+    ViewEncapsulation,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FuseConfirmationConfig } from '@fuse/services/confirmation';
@@ -37,12 +44,12 @@ export class EditTeamComponent implements OnInit {
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<EditTeamComponent>,
         private cdr: ChangeDetectorRef
-    ) {       // Set up current team and managers
-        this.setUpCurrentTeam(this.data);}
+    ) {
+        // Set up current team and managers
+        this.setUpCurrentTeam(this.data);
+    }
 
     ngOnInit(): void {
- 
-
         // Initialize the form
         this.editTeamForm = this.fb.group({
             teamName: [
@@ -59,7 +66,10 @@ export class EditTeamComponent implements OnInit {
                 [FuseValidators.stringInputValidator()],
             ],
             currentManager: [
-                { value: this.currentTeam?.manager?.fullName || '', disabled: true },
+                {
+                    value: this.currentTeam?.manager?.fullName || '',
+                    disabled: true,
+                },
             ],
             newManager: [''],
         });
@@ -79,18 +89,9 @@ export class EditTeamComponent implements OnInit {
     onSubmit(): void {
         if (this.editTeamForm.valid) {
             const newTeam = this.editTeamForm.getRawValue();
-            newTeam.onsiteEmployees = this.currentTeam.onsiteEmployees;
-            newTeam.idTeam = this.currentTeam.idTeam;
 
+            this.updateCurrentManager(newTeam)
 
-            if (this.hasChanges(newTeam)) {
-                this.dialogRef.close({
-                    status: 'confirmed',
-                    updatedTeam: newTeam,
-                });
-            } else {
-                console.log('No changes detected');
-            }
         } else {
             console.log('Form invalid');
         }
@@ -102,6 +103,22 @@ export class EditTeamComponent implements OnInit {
             this.currentTeam.description !== newTeam.description ||
             newTeam.newManager !== ''
         );
+    }
+
+    updateCurrentManager(newTeam : any ){
+        if (this.hasChanges(newTeam)) {
+            //checking if we need to affect the current manager to the new one if its empty
+            this.currentTeam.teamName = newTeam.teamName;
+            this.currentTeam.description = newTeam.description;
+            if (newTeam.newManager != '')
+                this.currentTeam.manager = newTeam.newManager;
+            this.dialogRef.close({
+                status: 'confirmed',
+                updatedTeam: this.currentTeam,
+            });
+        } else {
+            console.log('No changes detected');
+        }
     }
 
     onCancel(): void {

@@ -1,5 +1,5 @@
-import { Role } from "./Role";
-import { UserStatus } from "./UserStatus";
+import { Role } from "../Role";
+import { UserStatus } from "../UserStatus";
 
 export class AffectRoleStatusRequest {
     idUser: number; // Use number for Long in Java

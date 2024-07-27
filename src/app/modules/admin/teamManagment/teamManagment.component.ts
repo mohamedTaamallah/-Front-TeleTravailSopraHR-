@@ -5,9 +5,7 @@ import {
     ViewEncapsulation,
 } from '@angular/core';
 import {
-    EditSettingsModel,
-    GridComponent,
-    PrintEventArgs,
+
     Sort,
 } from '@syncfusion/ej2-angular-grids';
 import { Team } from 'app/core/entities/Team';
@@ -25,6 +23,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { AdminService } from 'app/core/services/admin/admin.service';
 import { User } from 'app/core/entities/User';
+import { BehaviorSubject } from 'rxjs';
+import { AllTeamsCountRequest } from 'app/core/entities/responses/AllTeamsCountRequest ';
 
 @Component({
     selector: 'example',
@@ -39,12 +39,15 @@ export class teamManagmentComponent {
         'teamName',
         'Descritption',
         'OnsiteEmployees',
+        'TeamMembers',
         'Manager',
         'Edit',
     ];
     TeamNumbers: number;
 
-    dataSource: any;
+    dataSource: MatTableDataSource<AllTeamsCountRequest> = new MatTableDataSource<AllTeamsCountRequest>(); 
+    teamsSubject: BehaviorSubject<AllTeamsCountRequest[]> = new BehaviorSubject<AllTeamsCountRequest[]>([]);
+
     configForm!: UntypedFormGroup;
     emailForm: FormGroup;
     public managers: User[] = [];
@@ -53,113 +56,84 @@ export class teamManagmentComponent {
     @ViewChild(MatSort) sort: MatSort;
 
     constructor(
-        private _liveAnnouncer: LiveAnnouncer,
         private _fuseConfirmationService: FuseConfirmationService,
         private _formBuilder: UntypedFormBuilder,
         private fb: FormBuilder,
-        private changeDetectorRefs: ChangeDetectorRef,
-        private sessionService: SessionService,
         private _adminService: AdminService,
         private cdr: ChangeDetectorRef
 
-    ) {        this.getAllManagers()
+    ) {        
+        this.getAllManagers()
     }
 
     ngOnInit(): void {
-        this.dataSource = this.sessionService.getTeams();
-        this.TeamNumbers = this.dataSource.length;
-        this.initForm();
+        this.getAllTeams()
         this.emailForm = this.fb.group({
             email: [''], // Email field with required and email validators
         });
     }
 
-    initForm(): void {
-        this.configForm = this._formBuilder.group({
-            message: '',
-            // icon: this._formBuilder.group({
-            //   show: true,
-            //   name: 'heroicons_outline:exclamation',
-            //   color: 'warn'
-            // }),
-            actions: this._formBuilder.group({
-                confirm: this._formBuilder.group({
-                    show: true,
-                    label: 'Remove',
-                    color: 'warn',
-                }),
-                cancel: this._formBuilder.group({
-                    show: true,
-                    label: 'Cancel',
-                }),
-            }),
-            dismissible: true,
-        });
-    }
+    // -----------------------------------------------------------------------------------------------------
+    // @ Form and display methods
+    // -----------------------------------------------------------------------------------------------------
 
-    getListPendingUsers() {}
-
-    updateTeamInList(updatedTeam: Team): void {
-        // Find the index of the team to be updated
-        const index = this.dataSource.findIndex((team: Team) => team.idTeam === updatedTeam.idTeam);
-        console.log(updatedTeam)
+    updateDataList(result : any){
+        const currentTeams = this.teamsSubject.getValue();
+        const index = currentTeams.findIndex((t: AllTeamsCountRequest) => t.team.idTeam === result.updatedTeam.idTeam);
 
         if (index !== -1) {
-            // Replace the old team with the updated team
-            this.dataSource[index] = updatedTeam;
-    
-            // Refresh the MatTableDataSource
-            this.dataSource = new MatTableDataSource(this.dataSource);
-            this.TeamNumbers = this.dataSource.data.length;
-    
-            // Ensure change detection runs
-            this.changeDetectorRefs.detectChanges();
+            console.log( currentTeams[index].team )
+
+            currentTeams[index].team = result.updatedTeam;
+        } else {
+            currentTeams.push(result.updatedTeam);
         }
-    }
-    onSearchChange(event: Event) {
-        this.searchTerm = (event.target as HTMLInputElement).value;
-    }
 
-    trackByFn(index: number, item: any): any {
-        return item.id || index;
+        this.teamsSubject.next(currentTeams);
+        this.dataSource.data = currentTeams; // Update the MatTableDataSource
+        this.onUpdateTeam(currentTeams[index].team)
+        console.log(currentTeams[index])
     }
-
-    /** Announce the change in sort state for assistive technology. */
-    announceSortChange(sortState: Sort) {}
 
     
-    /**
-     * Open confirmation dialog
-     */
-    openConfirmationDialog(team: Team, newStatus: string,): void {
-        this.initForm();
-        const managers = this.managers
-
+    // -----------------------------------------------------------------------------------------------------
+    // @ Dialog Opening methods
+    // -----------------------------------------------------------------------------------------------------
+    
+    openEditDialog(team: Team): void {
+        //this.initForm();
+        const managers = this.managers;
+    
         const dialogRef2 = this._fuseConfirmationService.openEditTeam({
             team,
             managers
         });
-        // Subscribe to afterClosed from the dialog reference
-        dialogRef2.afterClosed().subscribe((result: { status: string, updatedTeam?: Team }) => {
+    
+        dialogRef2.afterClosed().subscribe((result: { status: string, updatedTeam: Team }) => {
             if (result) {
-                if (result.status === 'confirmed') {
-                    if (result.updatedTeam) {
-                        this.updateTeamInList(result.updatedTeam);
-
-                        console.log("Updated team data:", result.updatedTeam);
-                        
-                        // Optionally, you can also send the updated team data to your server here
-                    }
+                if (result.status === 'confirmed' && result.updatedTeam) {
+                    this.updateDataList(result)
                 } else if (result.status === 'cancelled') {
                     console.log('Operation cancelled');
-                    // Handle cancellation if needed
                 }
             }
         });
     }
 
-    applyFilter(searchTerm: string): void {
-        this.searchTerm = searchTerm.trim().toLowerCase();
+    openAddDialog(): void {
+        const managers = this.managers;
+        const dialogRef2 = this._fuseConfirmationService.openAddTeam({
+            managers
+        });
+    
+        dialogRef2.afterClosed().subscribe((result: { status: string, updatedTeam: Team }) => {
+            if (result) {
+                if (result.status === 'confirmed' && result.updatedTeam) {
+                } else if (result.status === 'cancelled') {
+                    console.log('Operation cancelled');
+                }
+            }
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -175,5 +149,54 @@ export class teamManagmentComponent {
                 console.error('Error fetching managers:', error);
             },
         });
+    }
+
+    getAllTeams(): void {
+        this._adminService.getAllTeams().subscribe({
+            next: (data: AllTeamsCountRequest[]) => {
+                this.teamsSubject.next(data); // Update the BehaviorSubject
+                this.dataSource.data = data // Update the BehaviorSubject
+                this.TeamNumbers = data.length;
+            },
+            error: (error) => {
+                console.error('Error fetching teams:', error);
+            },
+        });
+    }
+
+    onUpdateTeam(team: Team): void {
+        this._adminService.updateTeam(team).subscribe({
+          next: (updatedTeam) => {
+            console.log('Team updated successfully:', updatedTeam);
+            this.getAllManagers()
+
+            // Handle the updated team, update UI or refresh data if necessary
+          },
+          error: (error) => {
+            console.error('Error updating team:', error);
+          }
+        });
+      }
+
+
+
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Filter related methods
+    // -----------------------------------------------------------------------------------------------------
+      
+    onSearchChange(event: Event) {
+        this.searchTerm = (event.target as HTMLInputElement).value;
+    }
+
+    trackByFn(index: number, item: any): any {
+        return item.id || index;
+    }
+
+    /** Announce the change in sort state for assistive technology. */
+    announceSortChange(sortState: Sort) {}
+
+    applyFilter(searchTerm: string): void {
+        this.searchTerm = searchTerm.trim().toLowerCase();
     }
 }

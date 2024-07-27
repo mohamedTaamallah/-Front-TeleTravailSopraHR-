@@ -10,10 +10,10 @@ import { User } from 'app/core/entities/User';
 import { AdminService } from 'app/core/services/admin/admin.service';
 import { delay } from 'rxjs/operators';
 import { createElement } from '@syncfusion/ej2-base';
-import { AffectRoleStatusRequest } from 'app/core/entities/AffectRoleStatusRequest';
 import { SessionService } from 'app/core/auth/Session/session.service';
-import { UserWithTeamDTO } from 'app/core/entities/UserWithTeamDTO';
+import { UserWithTeamDTO } from 'app/core/entities/responses/UserWithTeamDTO';
 import { Team } from 'app/core/entities/Team';
+import { AffectRoleStatusRequest } from 'app/core/entities/requests/AffectRoleStatusRequest';
 
 @Component({
     selector: 'example',
