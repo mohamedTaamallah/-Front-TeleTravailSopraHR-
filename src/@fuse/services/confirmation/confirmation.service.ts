@@ -11,7 +11,7 @@ import { AddTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/add
 @Injectable()
 export class FuseConfirmationService
 {
-    private _defaultConfig: FuseConfirmationConfig = {
+    public _defaultConfig: FuseConfirmationConfig = {
         title      : 'Confirm action',
         message    : 'Are you sure you want to confirm this action?',
         icon       : {

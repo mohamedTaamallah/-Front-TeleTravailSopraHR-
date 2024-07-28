@@ -51,4 +51,9 @@ export class AdminService {
   createTeam(team: Team): Observable<Team> {
     return this.http.post<Team>(`${this.TeamApiUrl}/createTeam`, team);
   }
+
+  //Delete a  Team 
+  deleteTeam(idTeam: number): Observable<Team> {
+    return this.http.delete<Team>(`${this.TeamApiUrl}/deleteTeam/${idTeam}`);
+  }
 }
