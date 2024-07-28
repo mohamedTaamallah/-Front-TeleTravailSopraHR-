@@ -41,8 +41,14 @@ export class AdminService {
     return this.http.get<User[]>(`${this.UserApiUrl}/getAllManagers`)
   }
 
+  //Updating an existing team and affecting a manager
   updateTeam(team: Team): Observable<Team> {
     const idManager = team.manager.idUser;
     return this.http.put<Team>(`${this.TeamApiUrl}/updateTeam/${idManager}`, team);
+  }
+
+   //Adding a new Team 
+  createTeam(team: Team): Observable<Team> {
+    return this.http.post<Team>(`${this.TeamApiUrl}/createTeam`, team);
   }
 }

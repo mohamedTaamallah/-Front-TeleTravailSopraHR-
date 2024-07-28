@@ -42,8 +42,7 @@ export class EditTeamComponent implements OnInit {
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: FuseConfirmationConfig,
         private fb: FormBuilder,
-        private dialogRef: MatDialogRef<EditTeamComponent>,
-        private cdr: ChangeDetectorRef
+        private dialogRef: MatDialogRef<EditTeamComponent>
     ) {
         // Set up current team and managers
         this.setUpCurrentTeam(this.data);
@@ -90,8 +89,7 @@ export class EditTeamComponent implements OnInit {
         if (this.editTeamForm.valid) {
             const newTeam = this.editTeamForm.getRawValue();
 
-            this.updateCurrentManager(newTeam)
-
+            this.updateCurrentManager(newTeam);
         } else {
             console.log('Form invalid');
         }
@@ -105,7 +103,7 @@ export class EditTeamComponent implements OnInit {
         );
     }
 
-    updateCurrentManager(newTeam : any ){
+    updateCurrentManager(newTeam: any) {
         if (this.hasChanges(newTeam)) {
             //checking if we need to affect the current manager to the new one if its empty
             this.currentTeam.teamName = newTeam.teamName;

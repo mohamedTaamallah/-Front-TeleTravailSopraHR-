@@ -4,10 +4,7 @@ import {
     ViewChild,
     ViewEncapsulation,
 } from '@angular/core';
-import {
-
-    Sort,
-} from '@syncfusion/ej2-angular-grids';
+import { Sort } from '@syncfusion/ej2-angular-grids';
 import { Team } from 'app/core/entities/Team';
 import { createElement } from '@syncfusion/ej2-base';
 import { SessionService } from 'app/core/auth/Session/session.service';
@@ -45,13 +42,15 @@ export class teamManagmentComponent {
     ];
     TeamNumbers: number;
 
-    dataSource: MatTableDataSource<AllTeamsCountRequest> = new MatTableDataSource<AllTeamsCountRequest>(); 
-    teamsSubject: BehaviorSubject<AllTeamsCountRequest[]> = new BehaviorSubject<AllTeamsCountRequest[]>([]);
+    dataSource: MatTableDataSource<AllTeamsCountRequest> =
+        new MatTableDataSource<AllTeamsCountRequest>();
+    teamsSubject: BehaviorSubject<AllTeamsCountRequest[]> = new BehaviorSubject<
+        AllTeamsCountRequest[]
+    >([]);
 
     configForm!: UntypedFormGroup;
     emailForm: FormGroup;
     public managers: User[] = [];
-
 
     @ViewChild(MatSort) sort: MatSort;
 
@@ -61,13 +60,12 @@ export class teamManagmentComponent {
         private fb: FormBuilder,
         private _adminService: AdminService,
         private cdr: ChangeDetectorRef
-
-    ) {        
-        this.getAllManagers()
+    ) {
+        this.getAllManagers();
     }
 
     ngOnInit(): void {
-        this.getAllTeams()
+        this.getAllTeams();
         this.emailForm = this.fb.group({
             email: [''], // Email field with required and email validators
         });
@@ -77,85 +75,96 @@ export class teamManagmentComponent {
     // @ Form and display methods
     // -----------------------------------------------------------------------------------------------------
 
-    updateDataList(result : any){
+    updateDataList(team: any, operation : string ) {
         const currentTeams = this.teamsSubject.getValue();
-        const index = currentTeams.findIndex((t: AllTeamsCountRequest) => t.team.idTeam === result.updatedTeam.idTeam);
+        const index = currentTeams.findIndex(
+            (t: AllTeamsCountRequest) =>
+                t.team.idTeam === team.idTeam
+        );
 
         if (index !== -1) {
-            console.log( currentTeams[index].team )
+            console.log(currentTeams[index].team);
 
-            currentTeams[index].team = result.updatedTeam;
+            currentTeams[index].team = team;
         } else {
-            currentTeams.push(result.updatedTeam);
+            
+            currentTeams.push(new AllTeamsCountRequest(team,0));
         }
 
         this.teamsSubject.next(currentTeams);
         this.dataSource.data = currentTeams; // Update the MatTableDataSource
-        this.onUpdateTeam(currentTeams[index].team)
-        console.log(currentTeams[index])
+        operation == "edit" ? this.onUpdateTeam(currentTeams[index].team) : this.onAddTeam(team)
+        this.getAllManagers();
+
     }
 
-    
     // -----------------------------------------------------------------------------------------------------
     // @ Dialog Opening methods
     // -----------------------------------------------------------------------------------------------------
-    
+
     openEditDialog(team: Team): void {
         //this.initForm();
         const managers = this.managers;
-    
+
         const dialogRef2 = this._fuseConfirmationService.openEditTeam({
             team,
-            managers
+            managers,
         });
-    
-        dialogRef2.afterClosed().subscribe((result: { status: string, updatedTeam: Team }) => {
-            if (result) {
-                if (result.status === 'confirmed' && result.updatedTeam) {
-                    this.updateDataList(result)
-                } else if (result.status === 'cancelled') {
-                    console.log('Operation cancelled');
+
+        dialogRef2
+            .afterClosed()
+            .subscribe((result: { status: string; updatedTeam: Team }) => {
+                if (result) {
+                    if (result.status === 'confirmed' && result.updatedTeam) {
+                        this.updateDataList(result.updatedTeam,"edit");
+                    } else if (result.status === 'cancelled') {
+                        console.log('Operation cancelled');
+                    }
                 }
-            }
-        });
+            });
     }
 
     openAddDialog(): void {
-        const managers = this.managers;
+        const managers = this.managers
         const dialogRef2 = this._fuseConfirmationService.openAddTeam({
-            managers
+            managers,
         });
-    
-        dialogRef2.afterClosed().subscribe((result: { status: string, updatedTeam: Team }) => {
-            if (result) {
-                if (result.status === 'confirmed' && result.updatedTeam) {
-                } else if (result.status === 'cancelled') {
-                    console.log('Operation cancelled');
+
+        dialogRef2
+            .afterClosed()
+            .subscribe((result: { status: string; newTeam: Team }) => {
+                if (result) {
+                    if (result.status === 'confirmed' && result.newTeam) {
+                        this.updateDataList(result.newTeam,"add")
+                    } else if (result.status === 'cancelled') {
+                        console.log('Operation cancelled');
+                    }
                 }
-            }
-        });
+            });
     }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Data treatment methods
     // -----------------------------------------------------------------------------------------------------
-    getAllManagers(): void {
+    getAllManagers(): User [] {
         this._adminService.getAllManagers().subscribe({
             next: (data: any) => {
-                this.managers = data as User[]; // Cast the data to User[]
                 this.cdr.detectChanges(); // Ensure change detection runs
+                this.managers = data as User[]; // Cast the data to User[]
             },
             error: (error) => {
                 console.error('Error fetching managers:', error);
             },
         });
+        return this.managers
+
     }
 
     getAllTeams(): void {
         this._adminService.getAllTeams().subscribe({
             next: (data: AllTeamsCountRequest[]) => {
                 this.teamsSubject.next(data); // Update the BehaviorSubject
-                this.dataSource.data = data // Update the BehaviorSubject
+                this.dataSource.data = data; // Update the BehaviorSubject
                 this.TeamNumbers = data.length;
             },
             error: (error) => {
@@ -166,17 +175,33 @@ export class teamManagmentComponent {
 
     onUpdateTeam(team: Team): void {
         this._adminService.updateTeam(team).subscribe({
-          next: (updatedTeam) => {
-            console.log('Team updated successfully:', updatedTeam);
-            this.getAllManagers()
+            next: (updatedTeam) => {
+                console.log('Team updated successfully:', updatedTeam);
+                this.getAllManagers();
 
-            // Handle the updated team, update UI or refresh data if necessary
-          },
-          error: (error) => {
-            console.error('Error updating team:', error);
-          }
+                // Handle the updated team, update UI or refresh data if necessary
+            },
+            error: (error) => {
+                console.error('Error updating team:', error);
+            },
         });
-      }
+    }
+
+
+
+    onAddTeam(team: Team): void {
+        this._adminService.createTeam(team).subscribe({
+            next: (newTeam) => {
+                console.log('Team added successfully:', newTeam);
+
+                // Handle the updated team, update UI or refresh data if necessary
+            },
+            error: (error) => {
+                console.error('Error updating team:', error);
+            },
+        });
+    }
+
 
 
 
@@ -184,7 +209,7 @@ export class teamManagmentComponent {
     // -----------------------------------------------------------------------------------------------------
     // @ Filter related methods
     // -----------------------------------------------------------------------------------------------------
-      
+
     onSearchChange(event: Event) {
         this.searchTerm = (event.target as HTMLInputElement).value;
     }
