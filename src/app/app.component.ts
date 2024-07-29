@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { appConfig } from './core/config/app.config';
 
 @Component({
     selector   : 'app-root',
@@ -12,5 +13,7 @@ export class AppComponent
      */
     constructor()
     {
+
+
     }
 }

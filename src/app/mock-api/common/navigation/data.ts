@@ -37,7 +37,7 @@ export const futuristicNavigation: FuseNavigationItem[] = [
 ];
 export const horizontalNavigation: FuseNavigationItem[] = [
     {
-        id   : 'Pending User Requests',
+        id   : 'UserList',
         title: 'Pending user Requests',
         type : 'basic',
         icon : 'heroicons_outline:user',
@@ -49,5 +49,12 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:user-group',
         link : '/TeamManagment'
+    },
+    {
+        id   : 'RemoteWorkScheduler',
+        title: 'Scheduler ',
+        type : 'basic',
+        icon : 'heroicons_outline:user-group',
+        link : '/RemoteWorkScheduler'
     }
 ];

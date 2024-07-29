@@ -2,9 +2,10 @@
 <ng-container *ngIf="appearance === 'bar'">
     <button
         mat-icon-button
+        
         *ngIf="!opened"
         (click)="open()">
-        <mat-icon [svgIcon]="'heroicons_outline:search'"></mat-icon>
+        <mat-icon class="stroke-current text-gray-100"  [svgIcon]="'heroicons_outline:search'"></mat-icon>
     </button>
     <div
         class="absolute inset-0 flex items-center shrink-0 z-99 bg-card"

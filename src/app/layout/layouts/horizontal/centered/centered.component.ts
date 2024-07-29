@@ -6,6 +6,7 @@ import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/co
 import { Navigation } from 'app/core/navigation/navigation.types';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 
+
 @Component({
     selector     : 'centered-layout',
     templateUrl  : './centered.component.html',
@@ -21,11 +22,11 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
      * Constructor
      */
     constructor(
-        private _activatedRoute: ActivatedRoute,
-        private _router: Router,
+
         private _navigationService: NavigationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _fuseNavigationService: FuseNavigationService
+        private _fuseNavigationService: FuseNavigationService,
+
     )
     {
     }
@@ -51,6 +52,9 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+
+     
+
         // Subscribe to navigation data
         this._navigationService.navigation$
             .pipe(takeUntil(this._unsubscribeAll))

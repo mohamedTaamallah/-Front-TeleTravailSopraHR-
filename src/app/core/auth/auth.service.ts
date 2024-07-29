@@ -162,6 +162,13 @@ export class AuthService
     {
         // Remove the access token from the local storage
         localStorage.removeItem('accessToken');
+        this._jwtService.removeToken()
+        localStorage.removeItem('navigation');
+
+        this._sessionService.clearUser()
+
+        this._sessionService.removeNavigationItem()
+        console.log(this._sessionService.getNavigationFromSession())
 
         // Set the authenticated flag to false
         this._authenticated = false;

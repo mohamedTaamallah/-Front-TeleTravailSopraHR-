@@ -1,8 +1,9 @@
 import { Route } from '@angular/router';
-import { AuthGuard } from 'app/core/auth/guards/auth.guard';
-import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
+import { AuthGuard } from 'app/core/auth/guards/authentication/auth.guard';
+import { NoAuthGuard } from 'app/core/auth/guards/authentication/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 import { InitialDataResolver } from 'app/app.resolvers';
+import { AuthorizationGuard } from './core/auth/guards/authorization/authorization.guard';
 
 // @formatter:off
 /* eslint-disable max-len */
@@ -22,7 +23,6 @@ export const appRoutes: Route[] = [
     // Auth routes for guests
     {
         path: '',
-        canMatch: [NoAuthGuard],
         component: LayoutComponent,
         data: {
             layout: 'empty'
@@ -66,6 +66,8 @@ export const appRoutes: Route[] = [
     {
         path: '',
         canMatch: [AuthGuard],
+        canActivate:[AuthorizationGuard],
+        data: { expectedRole: 'ADMINISTRATOR' },
         component: LayoutComponent,
         resolve: {
             initialData: InitialDataResolver,
@@ -73,6 +75,22 @@ export const appRoutes: Route[] = [
         children: [
             {path: 'UsersList', loadChildren: () => import('app/modules/admin/userRequestsList/userRequestsList.module').then(m => m.UserRequestsListModule)},
             {path: 'TeamManagment', loadChildren: () => import('app/modules/admin/teamManagment/teamManagment.module').then(m => m.teamManagmentModule)},
+
+        ]
+    },
+
+    // Collaborator routes
+    {
+        path: '',
+        canMatch: [AuthGuard],
+        canActivate:[AuthorizationGuard],
+        data: { expectedRole: 'COLLABORATOR' },
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        children: [
+            {path: 'RemoteWorkScheduler', loadChildren: () => import('app/modules/collaborator/scheduler/collaboratorScheduler.module').then(m => m.collaboratorSchedulerModule)},
 
         ]
     }

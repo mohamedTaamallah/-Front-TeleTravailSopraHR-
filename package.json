@@ -26,6 +26,7 @@
         "@angular/router": "15.1.1",
         "@ngneat/transloco": "4.2.2",
         "@syncfusion/ej2-angular-grids": "^26.1.42",
+        "@syncfusion/ej2-angular-schedule": "^26.1.5",
         "apexcharts": "3.36.3",
         "crypto-js": "3.3.0",
         "highlight.js": "11.7.0",

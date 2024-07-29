@@ -40,7 +40,8 @@ public teamParams: Object;
      */
     constructor(
         private adminService: AdminService,
-    ) {}
+        private _sessionService : SessionService
+    ) {       }
 
     ngOnInit(): void {
 

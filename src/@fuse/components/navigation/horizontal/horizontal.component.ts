@@ -28,7 +28,7 @@ export class FuseHorizontalNavigationComponent implements OnChanges, OnInit, OnD
     constructor(
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseNavigationService: FuseNavigationService,
-        private _fuseUtilsService: FuseUtilsService
+        private _fuseUtilsService: FuseUtilsService,
     )
     {
     }
@@ -57,6 +57,8 @@ export class FuseHorizontalNavigationComponent implements OnChanges, OnInit, OnD
      */
     ngOnInit(): void
     {
+
+        
         // Make sure the name input is not an empty string
         if ( this.name === '' )
         {

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { FuseNavigationItem } from '@fuse/components/navigation';
 import { Team } from 'app/core/entities/Team';
 import { User } from 'app/core/entities/User';
 
@@ -36,15 +37,27 @@ export class SessionService {
         return value ? JSON.parse(value) : null;
     }
 
-    saveAllTeams(Teams: Team []): any {
-        return sessionStorage.setItem('teams', JSON.stringify(Teams));
+    // session-storage.utils.ts
+    setSessionStorage(key: string, value: any): void {
+        sessionStorage.setItem(key, JSON.stringify(value));
     }
 
-  // Get the list of teams from sessionStorage
-  getTeams(): Team[] | null {
-    const teamString = sessionStorage.getItem('teams');
-    return teamString ? JSON.parse(teamString) : null;
-  }
+    getSessionStorage(key: string): any {
+        const item = sessionStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+    }
 
+    saveNavigationToSession(navigation: FuseNavigationItem[]): void {
+        this.setSessionStorage('navigation', navigation);
+    }
 
+    getNavigationFromSession(): FuseNavigationItem[] | null {
+        return this.getSessionStorage('navigation');
+    }
+
+    removeNavigationItem(): void {
+        sessionStorage.removeItem('navigation');
+        console.log(this.getNavigationFromSession())
+
+    }
 }

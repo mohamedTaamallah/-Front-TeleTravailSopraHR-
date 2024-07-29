@@ -4,14 +4,11 @@ import {
     ViewChild,
     ViewEncapsulation,
 } from '@angular/core';
-import { Sort } from '@syncfusion/ej2-angular-grids';
 import { Team } from 'app/core/entities/Team';
-import { SessionService } from 'app/core/auth/Session/session.service';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
+
 import {
     FormBuilder,
     FormGroup,
-    UntypedFormGroup,
     FormControl,
 } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
@@ -21,6 +18,7 @@ import { AdminService } from 'app/core/services/admin/admin.service';
 import { User } from 'app/core/entities/User';
 import { BehaviorSubject } from 'rxjs';
 import { AllTeamsCountRequest } from 'app/core/entities/responses/AllTeamsCountRequest ';
+import { SessionService } from 'app/core/auth/Session/session.service';
 
 
 @Component({
@@ -57,12 +55,15 @@ export class teamManagmentComponent {
         private _fuseConfirmationService: FuseConfirmationService,
         private fb: FormBuilder,
         private _adminService: AdminService,
-        private cdr: ChangeDetectorRef
-    ) {
-        this.getAllManagers();
+        private cdr: ChangeDetectorRef,
+        private _sessionService : SessionService
+    ) {        
+    
     }
+    
 
     ngOnInit(): void {
+
         this.getAllTeams();
         this.searchForm = this.fb.group({
             email: [''], // Email field with required and email validators

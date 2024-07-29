@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FuseNavigationItem } from '@fuse/components/navigation/navigation.types';
+import { SessionService } from 'app/core/auth/Session/session.service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,7 @@ export class FuseNavigationService
     /**
      * Constructor
      */
-    constructor()
+    constructor(private sessionService : SessionService)
     {
     }
 
@@ -48,6 +49,7 @@ export class FuseNavigationService
      */
     getComponent<T>(name: string): T
     {
+        
         return this._componentRegistry.get(name);
     }
 

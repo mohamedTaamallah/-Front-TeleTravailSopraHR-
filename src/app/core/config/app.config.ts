@@ -32,8 +32,8 @@ export interface AppConfig
  *
  * "Themes" are required for Tailwind to generate themes.
  */
-export const appConfig: AppConfig = {
-    layout : 'centered',
+export let appConfig: AppConfig = {
+    layout : 'enterprise',
     scheme : 'light',
     screens: {
         sm: '600px',

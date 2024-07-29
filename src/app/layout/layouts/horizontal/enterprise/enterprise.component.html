@@ -4,7 +4,7 @@
 <!-- Navigation -->
 <ng-container *ngIf="isScreenSmall">
     <fuse-vertical-navigation
-        class="dark bg-gray-900 print:hidden"
+        class="bg-amber-500 print:hidden"
         [mode]="'over'"
         [name]="'mainNavigation'"
         [navigation]="navigation.default"
@@ -28,7 +28,7 @@
     <!-- Header -->
     <div class="relative flex flex-col flex-0 justify-center w-full h-16 sm:h-20 md:h-36 overflow-hidden z-49 shadow dark:shadow-none print:hidden">
         <!-- Top bar -->
-        <div class="relative dark flex flex-auto justify-center w-full px-4 md:px-8 bg-gray-800 dark:bg-gray-900">
+        <div class="relative dark flex flex-auto justify-center w-full px-4 md:px-8 bg-amber-500 dark:bg-gray-900">
             <div class="flex items-center w-full max-w-360 h-16 sm:h-20">
                 <!-- Logo -->
                 <ng-container *ngIf="!isScreenSmall">
@@ -49,7 +49,6 @@
                 </ng-container>
                 <!-- Components -->
                 <div class="flex items-center pl-2 ml-auto space-x-0.5 sm:space-x-2">
-                    <languages></languages>
                     <fuse-fullscreen class="hidden md:block"></fuse-fullscreen>
                     <search [appearance]="'bar'"></search>
                     <shortcuts></shortcuts>
@@ -58,7 +57,7 @@
                     <button
                         class="lg:hidden"
                         mat-icon-button
-                        (click)="quickChat.toggle()">
+                        >
                         <mat-icon [svgIcon]="'heroicons_outline:chat-alt-2'"></mat-icon>
                     </button>
                     <user></user>
@@ -90,11 +89,11 @@
     <!-- Footer -->
     <div class="relative flex flex-0 justify-center w-full px-6 md:px-8 z-49 border-t bg-card print:hidden">
         <div class="flex items-center w-full max-w-360 h-14 sm:h-20">
-            <span class="font-medium text-secondary">Fuse &copy; {{currentYear}}</span>
+            <span class="font-medium text-secondary">Sopra &copy; {{currentYear}}</span>
         </div>
     </div>
 
 </div>
 
 <!-- Quick chat -->
-<quick-chat #quickChat="quickChat"></quick-chat>
+<!-- <quick-chat #quickChat="quickChat"></quick-chat> -->

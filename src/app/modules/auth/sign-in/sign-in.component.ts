@@ -8,8 +8,10 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertType } from '@fuse/components/alert';
+import { FuseConfigService } from '@fuse/services/config';
 import { AuthService } from 'app/core/auth/auth.service';
 import { SessionService } from 'app/core/auth/Session/session.service';
+import { appConfig } from 'app/core/config/app.config';
 import { Role } from 'app/core/entities/Role';
 import { Team } from 'app/core/entities/Team';
 import { AdminService } from 'app/core/services/admin/admin.service';
@@ -40,7 +42,7 @@ export class AuthSignInComponent implements OnInit {
         private _formBuilder: UntypedFormBuilder,
         private _router: Router,
         private _sessionService: SessionService,
-        private _adminService: AdminService
+
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -93,6 +95,23 @@ export class AuthSignInComponent implements OnInit {
 
                 // Navigate to the redirect url
                 this._router.navigateByUrl(redirectURL);
+
+
+                switch (this._sessionService.getUser().role) {
+                    case Role.ADMINISTRATOR:
+                        this._router.navigateByUrl(redirectURL);
+                        break;
+                    case Role.COLLABORATOR:
+                        this._router.navigateByUrl("/RemoteWorkScheduler");
+
+
+                        break;
+                    default:
+
+                        break;
+                }
+
+
             },
             (error) => {
                 // Re-enable the form

@@ -3,7 +3,8 @@
     mat-icon-button
     (click)="openPanel()"
     #shortcutsOrigin>
-    <mat-icon [svgIcon]="'heroicons_outline:bookmark'"></mat-icon>
+    <mat-icon      class="stroke-current text-gray-100" 
+     [svgIcon]="'heroicons_outline:bookmark'"></mat-icon>
 </button>
 
 <!-- Shortcuts panel -->
@@ -103,7 +104,7 @@
                 <div class="grid grid-cols-2 grid-flow-row">
                     <!-- Shortcut -->
                     <ng-container *ngFor="let shortcut of shortcuts; trackBy: trackByFn">
-                        <div class="relative group flex flex-col overflow-hidden bg-card border-r border-b even:border-r-0 hover:bg-gray-50 dark:hover:bg-black dark:hover:bg-opacity-5">
+                        <div class="relative group flex flex-col overflow-hidden bg-card border-r border-b even:border-r-0 hover:bg-gray-10 dark:hover:bg-black dark:hover:bg-opacity-5">
                             <ng-container *ngIf="mode === 'modify'">
                                 <div
                                     class="absolute inset-0 z-99 cursor-pointer"
@@ -128,7 +129,7 @@
                             </a>
                             <!-- Link content template -->
                             <ng-template #linkContent>
-                                <div class="relative flex shrink-0 items-center justify-center w-12 h-12 mb-3 rounded-full bg-gray-100 dark:bg-gray-700">
+                                <div class="relative flex shrink-0 items-center justify-center w-12 h-12 mb-3 rounded-full bg-gray-10 dark:bg-gray-700">
                                     <mat-icon
                                         class="absolute opacity-0 group-hover:opacity-100 z-20 icon-size-5"
                                         *ngIf="mode === 'modify'"

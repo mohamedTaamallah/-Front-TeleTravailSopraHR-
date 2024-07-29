@@ -1,7 +1,9 @@
 <!-- Button -->
 <button
+
     mat-icon-button
     [matMenuTriggerFor]="userActions">
+    <mat-icon class="stroke-current text-gray-100" [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
 
 </button>
 
@@ -20,7 +22,7 @@
         <span>Profile</span>
     </button>
     <button mat-menu-item>
-        <mat-icon [svgIcon]="'heroicons_outline:cog'"></mat-icon>
+        <mat-icon class="bg-gray-10" [svgIcon]="'heroicons_outline:cog'"></mat-icon>
         <span>Settings</span>
     </button>
     <button
