@@ -125,9 +125,9 @@ export class AuthSignUpComponent implements OnInit {
                 hiringDate: ['', Validators.required],
             }),
             step3: this._formBuilder.group({
-                isTwoFirstWeek: ['', Validators.required],
+                isTwoFirstWeek: [null, Validators.required],
                 daysOfStudy: [
-                    '',
+                    null,
                     [
                         Validators.required,
                         FuseValidators.exactlyTwoDaysValidator(),
@@ -149,6 +149,7 @@ export class AuthSignUpComponent implements OnInit {
             } else {
                 this.signUpForm.get('step3.isTwoFirstWeek').clearValidators();
                 this.signUpForm.get('step3.daysOfStudy').clearValidators();
+
                 this.displayAlternateOption = false;
             }
             this.signUpForm
@@ -174,11 +175,14 @@ export class AuthSignUpComponent implements OnInit {
             this.showAlert = true;
             return;
         }
+ 
 
         // Disable the form
         this.signUpForm.disable();
 
         this.mapFormDataToUser();
+
+        
 
         // Hide the alert
         this.showAlert = false;

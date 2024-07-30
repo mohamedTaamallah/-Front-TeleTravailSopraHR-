@@ -19,7 +19,7 @@ export class collaboratorSchedulerComponent
 
     }
 
-    public selectedDate: Date = new Date(2021, 0, 10);
+    public selectedDate: Date = new Date(2021,6, 10);
     public eventSettings: EventSettingsModel = { dataSource: extend([], null, true) as Record<string, any>[] };
 }
 
