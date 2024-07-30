@@ -54,7 +54,7 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         id   : 'RemoteWorkScheduler',
         title: 'Scheduler ',
         type : 'basic',
-        icon : 'heroicons_outline:user-group',
+        icon : 'heroicons_outline:calendar',
         link : '/RemoteWorkScheduler'
     }
 ];
