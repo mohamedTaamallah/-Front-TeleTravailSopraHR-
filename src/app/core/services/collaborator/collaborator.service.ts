@@ -29,11 +29,15 @@ export class CollaboratorService {
         );
     }
 
+    //Getting the remote work for the user 
     getRemoteWorkRequestByUser(idUser: number){
       return this._httpClient.get< RemoteWorkRequest[]>(
         `${this._remoteWorkRequestApiUrl}/getAllRemoteWorkRequestByUser/${idUser}`
     );
     }
 
-
+    //Canceling the remote work request 
+    cancelRemoteWorkRequest(remoteWorkRequestID: number): Observable<RemoteWorkRequest> {
+      return this._httpClient.post<RemoteWorkRequest>(`${this._remoteWorkRequestApiUrl}/cancelRemoteWorkRequest/${remoteWorkRequestID}`, {});
+    }
 }
