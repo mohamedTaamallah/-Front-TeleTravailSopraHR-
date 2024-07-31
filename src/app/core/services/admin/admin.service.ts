@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../auth/Api/Apis';
-import { JwtTokenService } from '../../auth/JWT/jwt-token.service';
 import { User } from '../../entities/User';
 import { UserWithTeamDTO } from 'app/core/entities/responses/UserWithTeamDTO';
 import { Team } from 'app/core/entities/Team';
@@ -15,7 +14,7 @@ import { AllTeamsCountRequest } from 'app/core/entities/responses/AllTeamsCountR
 })
 export class AdminService {
 
-  constructor(private http: HttpClient, private jwtService : JwtTokenService) { }
+  constructor(private http: HttpClient) { }
 
   private UserApiUrl: string = environment.UserApiUrl;
   private TeamApiUrl: string = environment.TeamApiUrl;

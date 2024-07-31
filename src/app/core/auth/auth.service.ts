@@ -7,6 +7,8 @@ import { JwtTokenService } from './JWT/jwt-token.service';
 import { SessionService } from './Session/session.service';
 import { environment } from './Api/Apis';
 import { User } from '../entities/User';
+import { Role } from '../entities/Role';
+import { Team } from '../entities/Team';
 
 @Injectable()
 export class AuthService
@@ -250,4 +252,6 @@ export class AuthService
     getEmailOrSopraID(value: string): Observable<User> {
         return this._httpClient.get<any>(`${this._authApiUrl}/getEmailOrSopraID/${value}`)
     }
+
+
 }
