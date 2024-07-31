@@ -16,6 +16,7 @@ import {
     TimelineViewsService,
     TimelineMonthService,
     ActionEventArgs,
+    PopupOpenEventArgs,
 } from '@syncfusion/ej2-angular-schedule';
 import { CollaboratorService } from 'app/core/services/collaborator/collaborator.service';
 import { BlockedDay } from 'app/core/entities/BlockedDay ';
@@ -23,6 +24,10 @@ import { SessionService } from 'app/core/auth/Session/session.service';
 import { User } from 'app/core/entities/User';
 import { Role } from 'app/core/entities/Role';
 import { Team } from 'app/core/entities/Team';
+import { RemoteWorkRequest } from 'app/core/entities/RemoteWorkRequest';
+
+
+
 
 @Component({
     selector: 'example',
@@ -51,6 +56,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     public blockedDays: BlockedDay[] = [];
     public user: User;
     public userTeam : Team 
+    public remoteWorkRequests : RemoteWorkRequest []
 
     /**
      * Constructor
@@ -62,23 +68,58 @@ export class collaboratorSchedulerComponent implements OnInit {
 
     ngOnInit(): void {
         this.user = this.sessionService.getUser();
-        this.onGetTeamByUser(this.user)
+        this.onGetAllBlockedDaysByTeam(this.user.userTeam.idTeam)
+        this.onGetRemoteWorkRequestByUser(this.user.idUser)
+
 
     }
 
-    onActionBegin(args: ActionEventArgs): void {
-        if (args.requestType === 'eventRemove') {
-            const event = args.data[0]; // assuming single event deletion
-            const eventDate = new Date(event.StartTime);
-            // Define the days when the delete button should be disabled (e.g., weekends)
-            if (eventDate.getDay() === 0 || eventDate.getDay() === 6) {
-                // Sunday or Saturday
-                args.cancel = true;
-                alert('Deleting events on weekends is disabled.');
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Scheduler handle methods
+    // -----------------------------------------------------------------------------------------------------
+    onPopupOpen(args: PopupOpenEventArgs): void {
+        if (args.type === 'Editor' || args.type === 'QuickInfo') {
+            const event = args.data;
+            const isBlockedDay = event.IsBlockedDay;
+            if (isBlockedDay) {
+                args.cancel = true; // Cancel popup for blocked days
+                alert('Editing or creating events on blocked days is disabled.');
             }
         }
     }
+    
 
+    transformBlockedDaysToEvents(blockedDays: BlockedDay[]): Record<string, any>[] {
+        return blockedDays.map(day => ({
+             Id: `blocked_${day.idBlockedDay}`, // Unique ID for the event
+            Subject: 'Blocked Day ['+day.reason+']', // Display text for the event
+            StartTime: new Date(day.blockedDate), // Start date and time
+            EndTime: new Date(new Date(day.blockedDate).setDate(new Date(day.blockedDate).getDate())), // End date and time (24 hours later)
+            IsAllDay: true, // Display as an all-day event
+            IsBlockedDay: true // Custom property to denote blocked day
+        }));
+    }
+
+    transformRemoteWorkRequestsToEvents(remoteWorkRequests: RemoteWorkRequest[]): Record<string, any>[] {
+        return remoteWorkRequests.map(request => ({
+            Id: `remote_${request.idRemoteWorkRequest}`,
+            Subject: 'Remote Work [' + request.comment + ']',
+            StartTime: new Date(request.requestDate),
+            EndTime: new Date(new Date(request.requestDate).setDate(new Date(request.requestDate).getDate())),
+            IsAllDay: true,
+            IsRemoteWork: true
+        }));
+    }
+
+    updateEventSettings() {
+        const blockedDaysEvents = this.transformBlockedDaysToEvents(this.blockedDays);
+        const remoteWorkEvents = this.transformRemoteWorkRequestsToEvents(this.remoteWorkRequests);
+
+        this.eventSettings = {
+            dataSource: [...blockedDaysEvents, ...remoteWorkEvents]
+        };
+    }
     // -----------------------------------------------------------------------------------------------------
     // @ Data handle methods
     // -----------------------------------------------------------------------------------------------------
@@ -87,10 +128,14 @@ export class collaboratorSchedulerComponent implements OnInit {
         this.collaboratorService.getAllBlockedDaysByTeam(idTeam).subscribe({
             next: (BlockedDay: BlockedDay[]) => {
                 this.blockedDays = BlockedDay;
+
                 console.log(
                     'blocked Days fetched successfully:',
                     this.blockedDays
                 );
+                this.eventSettings = {
+                    dataSource: this.transformBlockedDaysToEvents(this.blockedDays)
+                };
             },
             error: (error: any) => {
                 // Handle error, e.g., log it or show a user-friendly message
@@ -102,18 +147,25 @@ export class collaboratorSchedulerComponent implements OnInit {
         });
     }
 
-    onGetTeamByUser(user: User) {
-        if (user.role === Role.COLLABORATOR) {
-            this.collaboratorService.getTeamByUser(user.idUser).subscribe({
-                next: (data: Team) => {
-                  this.userTeam = data
-                  this.onGetAllBlockedDaysByTeam(this.userTeam.idTeam)
 
-                },
-                error: (err) => {
-                    console.error(err);
-                },
-            });
-        }
+
+    onGetRemoteWorkRequestByUser(idUser : number){
+        this.collaboratorService.getRemoteWorkRequestByUser(idUser).subscribe({
+            next: (RemoteWorkRequest: RemoteWorkRequest[]) => {
+                    this.remoteWorkRequests = RemoteWorkRequest
+                    this.updateEventSettings()
+                    console.log(RemoteWorkRequest)
+            },
+            error: (error: any) => {
+                // Handle error, e.g., log it or show a user-friendly message
+                console.error('Error fetching blocked days :', error);
+            },
+            complete: () => {
+                console.log('Fetch complete');
+            },
+        });
+
     }
+
+    
 }
