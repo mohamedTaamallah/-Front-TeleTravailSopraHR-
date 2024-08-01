@@ -18,6 +18,8 @@
                       <ejs-schedule class='schedule-block-events'
                           #schedule
                           height='650px'
+                          [workDays]="[1, 2, 3, 4, 5]"
+                          [showWeekend]="false"
                           [(selectedDate)]="selectedDate"
                           [eventSettings]="eventSettings"
                           [currentView]="currentView"
