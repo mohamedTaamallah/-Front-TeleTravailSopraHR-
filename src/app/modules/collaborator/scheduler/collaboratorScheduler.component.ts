@@ -1,30 +1,28 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Type } from '@angular/core';
 import { extend } from '@syncfusion/ej2-base';
 import {
     EventSettingsModel,
     View,
-    EventRenderedArgs,
+    ActionEventArgs,
+    PopupOpenEventArgs,
     DayService,
     WeekService,
     WorkWeekService,
     MonthService,
     AgendaService,
-    ResizeService,
-    DragAndDropService,
-    ScheduleModule,
     MonthAgendaService,
     TimelineViewsService,
     TimelineMonthService,
-    ActionEventArgs,
-    PopupOpenEventArgs,
+    EventRenderedArgs,
 } from '@syncfusion/ej2-angular-schedule';
 import { CollaboratorService } from 'app/core/services/collaborator/collaborator.service';
-import { BlockedDay } from 'app/core/entities/BlockedDay ';
 import { SessionService } from 'app/core/auth/Session/session.service';
 import { User } from 'app/core/entities/User';
-import { Role } from 'app/core/entities/Role';
-import { Team } from 'app/core/entities/Team';
 import { RemoteWorkRequest } from 'app/core/entities/RemoteWorkRequest';
+import { forkJoin } from 'rxjs';
+import { BlockedDay } from 'app/core/entities/BlockedDay ';
+import { RemoteWorkRequestStatus } from 'app/core/entities/RemoteWorkRequestStatus';
+import { Team } from 'app/core/entities/Team';
 
 @Component({
     selector: 'example',
@@ -39,47 +37,45 @@ import { RemoteWorkRequest } from 'app/core/entities/RemoteWorkRequest';
         TimelineViewsService,
         TimelineMonthService,
     ],
+    styleUrls  : ['./collaboratorScheduler.component.scss']
+
 })
 export class collaboratorSchedulerComponent implements OnInit {
-    // -----------------------------------------------------------------------------------------------------
-    // @ Schedule inital Settings params  methods
-    // -----------------------------------------------------------------------------------------------------
     public selectedDate: Date = new Date(2024, 6, 10);
     public eventSettings: EventSettingsModel = {
         dataSource: extend([], null, true) as Record<string, any>[],
     };
     public currentView: View = 'Month';
-    public views: View[] = ['Month', 'Agenda'];
+    public views: View[] = ['Week','Month', 'Agenda'];
     public blockedDays: BlockedDay[] = [];
     public user: User;
     public userTeam: Team;
     public remoteWorkRequests: RemoteWorkRequest[];
+    public isDataLoaded: boolean = false; // Flag to check if data is loaded
 
-    /**
-     * Constructor
-     */
+    
+
     constructor(
         private collaboratorService: CollaboratorService,
         private sessionService: SessionService
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         this.user = this.sessionService.getUser();
-        this.onGetAllBlockedDaysByTeam(this.user.userTeam.idTeam);
-        this.onGetRemoteWorkRequestByUser(this.user.idUser);
+        this.onfetchData();
     }
 
+
     // -----------------------------------------------------------------------------------------------------
-    // @ Scheduler handle methods
+    // @ Scheduler settings  methods
     // -----------------------------------------------------------------------------------------------------
 
     onActionBegin(args: ActionEventArgs): void {
         if (args.requestType === 'eventRemove') {
-            const event = args.data[0]; // Get the event being removed
+            const event = args.data[0];
             const eventId = event.Id as string;
             if (eventId.startsWith('remote_')) {
                 const remoteWorkRequestId = eventId.split('_')[1];
-                // Perform deletion logic for remote work request
                 this.onDeleteRemoteWorkRequest(remoteWorkRequestId);
             }
         }
@@ -89,29 +85,50 @@ export class collaboratorSchedulerComponent implements OnInit {
         if (args.type === 'Editor' || args.type === 'QuickInfo') {
             const event = args.data;
             const isBlockedDay = event.IsBlockedDay;
-            if (isBlockedDay) {
-                args.cancel = true; // Cancel popup for blocked days
-                alert(
-                    'Editing or creating events on blocked days is disabled.'
-                );
+            const isRemoteWork = event.IsRemoteWork;
+            const status = event.Status;
+
+            if (isBlockedDay || (isRemoteWork && status !== RemoteWorkRequestStatus.PENDING)) {
+                this.checkEventSettings(args);
+            } else if (this.isRemoteWorkRequestExists(event.StartTime,this.user.idUser)) {
+                args.cancel = true;
+                alert('A remote work request already exists for this day.');
+            }
+            else if (this.isBlockedDayExists(event.startTime)) {
+                args.cancel = true;
+                alert('A Blocked Day exists for this day.');
             }
         }
     }
+
+    isRemoteWorkRequestExists(date: Date, userId: number): boolean {
+        return this.remoteWorkRequests.some(request =>
+            new Date(request.requestDate).toDateString() === date.toDateString() &&
+            Number(request.user.idUser)== userId
+        );
+    }
+
+    isBlockedDayExists(date: Date): boolean {
+        return this.blockedDays.some(request =>
+            new Date(request.blockedDate).toDateString() === date.toDateString()
+        );
+    }
+
 
     transformBlockedDaysToEvents(
         blockedDays: BlockedDay[]
     ): Record<string, any>[] {
         return blockedDays.map((day) => ({
-            Id: `blocked_${day.idBlockedDay}`, // Unique ID for the event
-            Subject: 'Blocked Day [' + day.reason + ']', // Display text for the event
-            StartTime: new Date(day.blockedDate), // Start date and time
-            EndTime: new Date(
-                new Date(day.blockedDate).setDate(
-                    new Date(day.blockedDate).getDate()
-                )
-            ), // End date and time (24 hours later)
-            IsAllDay: true, // Display as an all-day event
-            IsBlockedDay: true, // Custom property to denote blocked day
+            Id: `blocked_${day.idBlockedDay}`,
+            Subject: `Blocked Day [${day.reason}]`,
+            StartTime: new Date(day.blockedDate),
+            EndTime: new Date(day.blockedDate),
+            IsAllDay: true,
+            IsBlockedDay: true,
+            Reason: day.reason,
+            Team: this.user.userTeam.teamName,
+            color:'#ef4444'
+        
         }));
     }
 
@@ -120,15 +137,14 @@ export class collaboratorSchedulerComponent implements OnInit {
     ): Record<string, any>[] {
         return remoteWorkRequests.map((request) => ({
             Id: `remote_${request.idRemoteWorkRequest}`,
-            Subject: 'Remote Work [' + request.comment + ']',
+            Subject: `Remote Work [${request.comment}]`,
             StartTime: new Date(request.requestDate),
-            EndTime: new Date(
-                new Date(request.requestDate).setDate(
-                    new Date(request.requestDate).getDate()
-                )
-            ),
+            EndTime: new Date(request.requestDate),
             IsAllDay: true,
             IsRemoteWork: true,
+            Comment: request.comment,
+            Status: request.requestStatus,
+            User: this.user,
         }));
     }
 
@@ -142,70 +158,114 @@ export class collaboratorSchedulerComponent implements OnInit {
 
         this.eventSettings = {
             dataSource: [...blockedDaysEvents, ...remoteWorkEvents],
+            fields: {
+                id: 'Id',
+                subject: { name: 'Subject' },
+                isAllDay: { name: 'IsAllDay' },
+                startTime: { name: 'StartTime' },
+                endTime: { name: 'EndTime' },
+            },
         };
+
+        this.isDataLoaded = true; // Set the flag to true once data is loaded
+
     }
+
+    checkEventSettings(args: Record<string, any>) {
+        const eventData = args.data;
+        console.log('Event Data:', eventData);
+
+        const quickPopup: HTMLElement = args.element.querySelector(
+            '.e-quick-popup-wrapper .e-event-popup'
+        );
+        const editButton: HTMLElement = quickPopup.querySelector(
+            '.e-header-icon-wrapper .e-edit'
+        );
+        const deleteButton: HTMLElement = quickPopup.querySelector(
+            '.e-header-icon-wrapper .e-delete'
+        );
+
+        if (editButton) editButton.remove();
+        if (deleteButton) deleteButton.remove();
+    }
+
     // -----------------------------------------------------------------------------------------------------
     // @ Data handle methods
     // -----------------------------------------------------------------------------------------------------
 
-    onGetAllBlockedDaysByTeam(idTeam: number): void {
-        this.collaboratorService.getAllBlockedDaysByTeam(idTeam).subscribe({
-            next: (BlockedDay: BlockedDay[]) => {
-                this.blockedDays = BlockedDay;
+    onfetchData(): void {
+        const teamId = this.user.userTeam.idTeam;
+        const userId = this.user.idUser;
 
-                console.log(
-                    'blocked Days fetched successfully:',
-                    this.blockedDays
-                );
-                this.eventSettings = {
-                    dataSource: this.transformBlockedDaysToEvents(
-                        this.blockedDays
-                    ),
-                };
-            },
-            error: (error: any) => {
-                // Handle error, e.g., log it or show a user-friendly message
-                console.error('Error fetching blocked days :', error);
-            },
-            complete: () => {
-                console.log('Fetch complete');
-            },
-        });
-    }
-
-    onGetRemoteWorkRequestByUser(idUser: number) {
-        this.collaboratorService.getRemoteWorkRequestByUser(idUser).subscribe({
-            next: (RemoteWorkRequest: RemoteWorkRequest[]) => {
-                this.remoteWorkRequests = RemoteWorkRequest;
+        forkJoin({
+            blockedDays:
+                this.collaboratorService.getAllBlockedDaysByTeam(teamId),
+            remoteWorkRequests:
+                this.collaboratorService.getRemoteWorkRequestByUser(userId),
+        }).subscribe({
+            next: ({ blockedDays, remoteWorkRequests }) => {
+                this.blockedDays = blockedDays;
+                this.remoteWorkRequests = remoteWorkRequests;
                 this.updateEventSettings();
-                console.log(RemoteWorkRequest);
             },
             error: (error: any) => {
-                // Handle error, e.g., log it or show a user-friendly message
-                console.error('Error fetching blocked days :', error);
+                console.error('Error fetching data:', error);
             },
             complete: () => {
-                console.log('Fetch complete');
+                console.log('Data fetch complete');
             },
         });
     }
 
-    onDeleteRemoteWorkRequest(RemoteWorkRequest: any) {
-        this.collaboratorService.cancelRemoteWorkRequest(RemoteWorkRequest).subscribe({
-            next: (RemoteWorkRequest: RemoteWorkRequest) => {
-
-            },
-            error: (error: any) => {
-                // Handle error, e.g., log it or show a user-friendly message
-                console.error('Error fetching blocked days :', error);
-            },
-            complete: () => {
-                console.log('Fetch complete');
-            },
-        });
+    onDeleteRemoteWorkRequest(remoteWorkRequestId: any) {
+        this.collaboratorService
+            .cancelRemoteWorkRequest(remoteWorkRequestId)
+            .subscribe({
+                next: (RemoteWorkRequest: RemoteWorkRequest) => {
+                    console.log(
+                        'Remote work request deleted:',
+                        RemoteWorkRequest
+                    );
+                },
+                error: (error: any) => {
+                    console.error('Error deleting remote work request:', error);
+                },
+                complete: () => {
+                    console.log('Delete complete');
+                },
+            });
     }
 
 
+    
+    onEventRendered(args: EventRenderedArgs): void {
+            const DateCell = args.data.StartTime.toDateString();
 
+            // Check if the cell date is a blocked day
+            if (this.blockedDays.some(day => new Date(day.blockedDate).toDateString() === DateCell)) {
+                args.element.style.backgroundColor='#06b6d4'
+            }
+
+            const request = this.remoteWorkRequests.find(request =>
+                new Date(request.requestDate).toDateString() === DateCell &&
+                Number(request.user.idUser) === this.user.idUser
+            );
+
+            if (request) {
+                switch (request.requestStatus) {
+                    case RemoteWorkRequestStatus.REFUSED:
+                        args.element.style.backgroundColor='#ef4444'
+                        break;
+                    case RemoteWorkRequestStatus.APPROVED:
+                        args.element.style.backgroundColor='#10b981'
+                        break;
+                    case RemoteWorkRequestStatus.PENDING:
+                        args.element.style.backgroundColor='##f59e0b'
+                        break;
+                }
+            }
+
+        }
+      
 
 }

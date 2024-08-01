@@ -1,5 +1,5 @@
-import { User } from "../user/user.types";
 import { RemoteWorkRequestStatus } from "./RemoteWorkRequestStatus";
+import { User } from "./User";
 
 
 export class RemoteWorkRequest {
