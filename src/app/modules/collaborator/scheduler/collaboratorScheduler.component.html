@@ -8,17 +8,17 @@
                   Remote work scheduler
               </div>
               <div class="flex items-center mt-4 sm:mt-0">
-                  <span class="text-secondary font-medium mr-4"></span>
-              </div>
+                  <span class="text-secondary font-large mr-4"></span>
+                  {{user.userTeam.onsiteEmployees}} collaborators must be on site
+                </div>
           </div>
   
           <div class="overflow-x-auto mx-6 mb-02">
               <div class="control-section">
                   <div class="col-lg-9 content-wrapper">
                       <ejs-schedule class='schedule-block-events'
-                          #schedule
+                          #scheduleObj
                           height='650px'
-                          [workDays]="[1, 2, 3, 4, 5]"
                           [showWeekend]="false"
                           [(selectedDate)]="selectedDate"
                           [eventSettings]="eventSettings"
