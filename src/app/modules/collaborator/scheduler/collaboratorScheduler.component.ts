@@ -41,7 +41,7 @@ import { UpdateRemoteWorkRequest } from 'app/core/entities/requests/updateRemote
     ],
 })
 export class collaboratorSchedulerComponent implements OnInit {
-    public selectedDate: Date = new Date(2024, 6, 10);
+    public selectedDate: Date = new Date();
     public eventSettings: EventSettingsModel = {
         dataSource: extend([], null, true) as Record<string, any>[],
     };
@@ -59,7 +59,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     constructor(
         private collaboratorService: CollaboratorService,
         private sessionService: SessionService,
-        private _fuseUtilsService: FuseUtilsService,
+        private _fuseUtilsService: FuseUtilsService
     ) {}
 
     ngOnInit(): void {
@@ -81,6 +81,8 @@ export class collaboratorSchedulerComponent implements OnInit {
             const eventId = event.Id as string;
             if (eventId.startsWith('remote_')) {
                 const remoteWorkRequestId = eventId.split('_')[1];
+                console.log(remoteWorkRequestId)
+
                 this.onDeleteRemoteWorkRequest(remoteWorkRequestId);
             }
         }
@@ -88,8 +90,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         if (args.requestType === 'eventSave') {
             const eventData = args.data;
 
-                this.handleUpdateEvent(eventData);
-            
+            this.handleUpdateEvent(eventData);
         }
         if (args.requestType === 'eventCreate') {
             this.isSavingNewRequest = true; // Set the flag to true for the first save
@@ -109,10 +110,7 @@ export class collaboratorSchedulerComponent implements OnInit {
 
             this.presetTitleAndDescription(args);
 
-            if (
-                isBlockedDay ||
-                (isRemoteWork )
-            ) {
+            if (isBlockedDay || isRemoteWork) {
                 this.checkEventSettings(args, status);
             } else if (
                 this.isRemoteWorkRequestExists(requestDate, this.user.idUser)
@@ -134,6 +132,18 @@ export class collaboratorSchedulerComponent implements OnInit {
                         `You cannot add more than ${this.maxApprovedRequestsPerMonth} approved remote work requests per month.`
                     );
                 }
+            } else if (requestDate < new Date()) {
+                // Check if there is any existing pending remote work request for the same user
+                args.cancel = true;
+                alert(
+                    'You cannot add a remote work request for a date in the past.'
+                );
+                return;
+            } else if (this.hasPendingRemoteWorkRequest(this.user.idUser)) {
+                // Check if there is any existing pending remote work request for the same user
+                args.cancel = true;
+                alert('You already have a pending remote work request.');
+                return;
             }
 
             // Store the event ID for editing purposes
@@ -143,7 +153,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         }
     }
 
-    //handles the update for a remote work 
+    //handles the update for a remote work
     handleUpdateEvent(eventData: Record<string, any>): void {
         // Extract ID and status from eventData
         const remoteWorkRequestId = Number(eventData.Id.split('_')[1]);
@@ -151,23 +161,24 @@ export class collaboratorSchedulerComponent implements OnInit {
 
         const updateRequest: UpdateRemoteWorkRequest = {
             remoteWorkRequestID: remoteWorkRequestId,
-            remoteWorkRequestStatus: remoteWorkRequestStatus
+            remoteWorkRequestStatus: remoteWorkRequestStatus,
         };
 
-        console.log(updateRequest)
+        console.log(updateRequest);
         //this.updateRemoteWorkRequest(updateRequest);
     }
 
     handleSaveEvent(eventData: Record<string, any>): void {
-        // Create a RemoteWorkRequest object from eventData
+        // Assuming eventData is an array of events
+        const event = eventData[0];
+        
         const remoteWorkRequest: RemoteWorkRequest = {
             user: this.user,
-            requestDate: this._fuseUtilsService.formatDateForServer(eventData[0].StartTime),
-            comment: eventData.Description || '', // Assuming Description is the comment
-            requestStatus: RemoteWorkRequestStatus.PENDING, // Set the default status
+            requestDate: this._fuseUtilsService.formatDateForServer(event.StartTime),
+            comment: event.Description || '', // Assuming Description is the comment
+            requestStatus: RemoteWorkRequestStatus.PENDING,
         };
-        console.log(remoteWorkRequest)
-
+    
         this.addRequest(remoteWorkRequest);
     }
 
@@ -376,6 +387,7 @@ export class collaboratorSchedulerComponent implements OnInit {
             .cancelRemoteWorkRequest(remoteWorkRequestId)
             .subscribe({
                 next: (RemoteWorkRequest: RemoteWorkRequest) => {
+                    this.handleOptimisticDelete(RemoteWorkRequest.idRemoteWorkRequest)
                     console.log(
                         'Remote work request deleted:',
                         RemoteWorkRequest
@@ -401,11 +413,11 @@ export class collaboratorSchedulerComponent implements OnInit {
                         'Remote Work Request added successfully:',
                         response
                     );
+                    this.onfetchData()
                 },
                 error: (error: any) => {
                     // Handle error response
                     console.error('Error adding remote work request:', error);
-
                 },
             });
     }
@@ -426,7 +438,6 @@ export class collaboratorSchedulerComponent implements OnInit {
                 error: (error: any) => {
                     // Handle error response
                     console.error('Error updating remote work request:', error);
-
                 },
             });
     }
@@ -468,5 +479,25 @@ export class collaboratorSchedulerComponent implements OnInit {
         return (
             approvedRequestsInMonth.length < this.maxApprovedRequestsPerMonth
         );
+    }
+
+    //checks if there is an already pending request befor adding a new one
+    hasPendingRemoteWorkRequest(userId: number): boolean {
+        console.log(this.remoteWorkRequests);
+
+        return this.remoteWorkRequests.some(
+            (request) =>
+                request.user.idUser === userId &&
+                request.requestStatus === RemoteWorkRequestStatus.PENDING
+        );
+    }
+
+    // Optimistically delete the request from the UI
+    handleOptimisticDelete(remoteWorkRequestId: number): void {
+        this.remoteWorkRequests = this.remoteWorkRequests.filter(
+            (request) =>
+                request.idRemoteWorkRequest !== Number(remoteWorkRequestId)
+        );
+        this.updateEventSettings();
     }
 }

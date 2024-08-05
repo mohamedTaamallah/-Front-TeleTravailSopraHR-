@@ -88,7 +88,7 @@ export class AuthSignUpComponent implements OnInit {
         this.signUpForm = this._formBuilder.group({
             step1: this._formBuilder.group({
                 fullName: [
-                    'qsd',
+                    '',
                     [
                         Validators.required,
                         Validators.minLength(3),
@@ -97,28 +97,28 @@ export class AuthSignUpComponent implements OnInit {
                     ],
                 ],
                 sopraID: [
-                    '12121212',
+                    '',
                     [
                         Validators.required,
-                        FuseValidators.lengthFormatValidator(8,true),
+                        FuseValidators.stringInputValidator(),
                     ],
                 ],
                 phoneNumber: [
-                    '12121212',
+                    '',
                     [
                         Validators.required,
                         FuseValidators.lengthFormatValidator(8,true),
                     ],
                 ],
                 email: [
-                    'qsdqsd@gmail.com',
+                    '',
                     [Validators.required, Validators.email],
                 ],
                 gender: ['', Validators.required],
             }),
             step2: this._formBuilder.group({
                 password: [
-                    'Mohamed123@',
+                    '',
                     [Validators.required, FuseValidators.passwordStrength()],
                 ],
                 role: ['', Validators.required],
