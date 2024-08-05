@@ -118,7 +118,7 @@ export class AuthSignUpComponent implements OnInit {
             }),
             step2: this._formBuilder.group({
                 password: [
-                    '',
+                    'Mohamed123@',
                     [Validators.required, FuseValidators.passwordStrength()],
                 ],
                 role: ['', Validators.required],

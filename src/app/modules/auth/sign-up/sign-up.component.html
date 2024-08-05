@@ -69,6 +69,8 @@
                                 [svgIcon]="'heroicons_outline:identification'"></mat-icon>
                                 <mat-error *ngIf="signUpForm.get('step1.sopraID').hasError('required')">sopraID is required</mat-error>
                                 <mat-error *ngIf="signUpForm.get('step1.sopraID').hasError('Exist')">sopraID already exists</mat-error>
+                                <mat-error *ngIf="signUpForm.get('step1.fullName').hasError('invalidFormat')">Full name should contain only numbers</mat-error>
+
                             </mat-form-field>
                     </div>
                     <div class="flex">
@@ -425,8 +427,7 @@
                 <div>our plateforme</div>
             </div>
             <div class="mt-6 text-lg tracking-tight leading-6 text-gray-100">
-                Fuse helps developers to build organized and well coded dashboards full of beautiful and rich modules.
-                Join us and start building your application today.
+                Welcome to Sopra's Remote Work Platform, where flexibility meets efficiency. Empowering you to work from anywhere, our platform streamlines your tasks, fosters collaboration, and ensures productivity.
             </div>
             <div class="flex items-center mt-8">
                 <div class="flex flex-0 items-center -space-x-1.5">
