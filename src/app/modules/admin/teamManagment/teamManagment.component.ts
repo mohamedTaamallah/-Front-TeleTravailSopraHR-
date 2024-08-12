@@ -4,11 +4,14 @@ import {
     ViewChild,
     ViewEncapsulation,
 } from '@angular/core';
+import { Sort } from '@syncfusion/ej2-angular-grids';
 import { Team } from 'app/core/entities/Team';
-
+import { SessionService } from 'app/core/auth/Session/session.service';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import {
     FormBuilder,
     FormGroup,
+    UntypedFormGroup,
     FormControl,
 } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
@@ -18,7 +21,6 @@ import { AdminService } from 'app/core/services/admin/admin.service';
 import { User } from 'app/core/entities/User';
 import { BehaviorSubject } from 'rxjs';
 import { AllTeamsCountRequest } from 'app/core/entities/responses/AllTeamsCountRequest ';
-import { SessionService } from 'app/core/auth/Session/session.service';
 
 
 @Component({
@@ -55,15 +57,12 @@ export class teamManagmentComponent {
         private _fuseConfirmationService: FuseConfirmationService,
         private fb: FormBuilder,
         private _adminService: AdminService,
-        private cdr: ChangeDetectorRef,
-        private _sessionService : SessionService
-    ) {        
-    
+        private cdr: ChangeDetectorRef
+    ) {
+        this.getAllManagers();
     }
-    
 
     ngOnInit(): void {
-
         this.getAllTeams();
         this.searchForm = this.fb.group({
             email: [''], // Email field with required and email validators
@@ -107,9 +106,7 @@ export class teamManagmentComponent {
                 break;
 
             case 'add':
-                if (index === -1) {
-                    currentTeams.push(new AllTeamsCountRequest(team, 0));
-                }
+                this.onAddTeam(team); // Call the asynchronous method to handle adding the team
                 break;
 
             case 'delete':
@@ -138,9 +135,9 @@ export class teamManagmentComponent {
                 this.onUpdateTeam(team);
                 break;
 
-            case 'add':
-                this.onAddTeam(team);
-                break;
+            // case 'add':
+            //     this.onAddTeam(team);
+            //     break;
 
             case 'delete':
                 this.onDeleteTeam(team);
@@ -154,8 +151,8 @@ export class teamManagmentComponent {
                 break;
         }
 
-        // Refresh managers list
-        this.getAllManagers();
+
+     
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -258,23 +255,37 @@ export class teamManagmentComponent {
                 this.getAllManagers();
 
                 // Handle the updated team, update UI or refresh data if necessary
+                this.getAllManagers()
             },
             error: (error) => {
                 console.error('Error updating team:', error);
             },
         });
     }
-
     onAddTeam(team: Team): void {
         this._adminService.createTeam(team).subscribe({
             next: (newTeam) => {
                 console.log('Team added successfully:', newTeam);
+    
+                // Update the list of teams with the new team
+                const currentTeams = this.teamsSubject.getValue();
+                currentTeams.push(new AllTeamsCountRequest(newTeam, 0)); // Add the new team to the current list
+    
+                // Update the BehaviorSubject and MatTableDataSource
+                this.teamsSubject.next(currentTeams);
+                this.dataSource.data = [...currentTeams]; // Trigger change detection by creating a new array reference
+                this.TeamNumbers = this.dataSource.data.length; // Update the team count
+    
+                // Optionally, you can also sort the data source again
+                this.dataSource.sort = this.sort;
 
-                // Handle the updated team, update UI or refresh data if necessary
+                //refresh the manager list 
+                this.getAllManagers()
             },
             error: (error) => {
                 console.error('Error adding team:', error);
-            },
+                // Handle the error if necessary
+            }
         });
     }
 
@@ -284,6 +295,8 @@ export class teamManagmentComponent {
                 console.log('Team deleted successfully:', deletedTeam);
 
                 // Handle the updated team, update UI or refresh data if necessary
+                this.getAllManagers()
+
             },
             error: (error) => {
                 console.error('Error deleting team:', error);
