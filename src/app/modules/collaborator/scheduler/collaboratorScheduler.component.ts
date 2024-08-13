@@ -107,43 +107,57 @@ export class collaboratorSchedulerComponent implements OnInit {
             const isBlockedDay = event.IsBlockedDay;
             const isRemoteWork = event.IsRemoteWork;
             const status = event.Status;
-    
+
             this.presetTitleAndDescription(args);
-    
+
             // Step 1: Validate request based on weekly pending limits
             if (this.hasExceededPendingRequestsForWeek(requestDate)) {
-                this._fuseUtilsService.cancelPopup(args, 'You cannot add more than 2 pending remote work requests in the same week.');
+                this._fuseUtilsService.cancelPopup(
+                    args,
+                    'You cannot add more than 2 pending remote work requests in the same week.'
+                );
                 return;
             }
-    
+
             // Step 2: Validate against blocked days or existing remote work requests
             if (isBlockedDay || isRemoteWork) {
                 this.checkEventSettings(args, status);
-            } else if (this.isRemoteWorkRequestExists(requestDate, this.user.idUser)) {
-                this._fuseUtilsService.cancelPopup(args, 'A remote work request already exists for this day.');
+            } else if (
+                this.isRemoteWorkRequestExists(requestDate, this.user.idUser)
+            ) {
+                this._fuseUtilsService.cancelPopup(
+                    args,
+                    'A remote work request already exists for this day.'
+                );
                 return;
             } else if (this.isBlockedDayExists(requestDate)) {
-                this._fuseUtilsService.cancelPopup(args, 'A Blocked Day exists for this day.');
+                this._fuseUtilsService.cancelPopup(
+                    args,
+                    'A Blocked Day exists for this day.'
+                );
                 return;
             }
-    
+
             // Step 3: Additional validations for remote work requests
             if (isRemoteWork) {
-                if (!this.canAddRemoteWorkRequest(requestDate)) {
-                    this._fuseUtilsService.cancelPopup(args, `You cannot add more than ${this.maxApprovedRequestsPerDay} approved remote work requests per day.`);
-                    return;
-                } else if (!this.canAddRemoteWorkRequestForMonth(requestDate)) {
-                    this._fuseUtilsService.cancelPopup(args, `You cannot add more than ${this.maxApprovedRequestsPerMonth} approved remote work requests per month.`);
+                if (!this.canAddRemoteWorkRequestForMonth(requestDate)) {
+                    this._fuseUtilsService.cancelPopup(
+                        args,
+                        `You cannot add more than ${this.maxApprovedRequestsPerMonth} approved remote work requests per month.`
+                    );
                     return;
                 }
             }
-    
+
             // Step 4: Prevent requests for past dates
             if (requestDate < new Date()) {
-                this._fuseUtilsService.cancelPopup(args, 'You cannot add a remote work request for a date in the past.');
+                this._fuseUtilsService.cancelPopup(
+                    args,
+                    'You cannot add a remote work request for a date in the past.'
+                );
                 return;
             }
-    
+
             // Step 5: Store the event ID for editing purposes
             if (args.type === 'Editor' && event.IsRemoteWork) {
                 this.currentEditingEventId = event.Id as string;
@@ -520,9 +534,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     }
 
     // Helper method to check if the user has exceeded pending requests in the current week
-    hasExceededPendingRequestsForWeek(
-        requestDate: Date,
-    ): boolean {
+    hasExceededPendingRequestsForWeek(requestDate: Date): boolean {
         const startOfWeek = this._fuseUtilsService.getStartOfWeek(requestDate);
         const endOfWeek = this._fuseUtilsService.getEndOfWeek(requestDate);
 
