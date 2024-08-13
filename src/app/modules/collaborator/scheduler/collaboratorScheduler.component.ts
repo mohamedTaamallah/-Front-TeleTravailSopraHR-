@@ -81,7 +81,7 @@ export class collaboratorSchedulerComponent implements OnInit {
             const eventId = event.Id as string;
             if (eventId.startsWith('remote_')) {
                 const remoteWorkRequestId = eventId.split('_')[1];
-                console.log(remoteWorkRequestId)
+                console.log(remoteWorkRequestId);
 
                 this.onDeleteRemoteWorkRequest(remoteWorkRequestId);
             }
@@ -103,50 +103,48 @@ export class collaboratorSchedulerComponent implements OnInit {
     onPopupOpen(args: PopupOpenEventArgs): void {
         if (args.type === 'Editor' || args.type === 'QuickInfo') {
             const event = args.data;
+            const requestDate = event.StartTime;
             const isBlockedDay = event.IsBlockedDay;
             const isRemoteWork = event.IsRemoteWork;
             const status = event.Status;
-            const requestDate = event.StartTime;
-
+    
             this.presetTitleAndDescription(args);
-
-            if (isBlockedDay || isRemoteWork) {
-                this.checkEventSettings(args, status);
-            } else if (
-                this.isRemoteWorkRequestExists(requestDate, this.user.idUser)
-            ) {
-                args.cancel = true;
-                alert('A remote work request already exists for this day.');
-            } else if (this.isBlockedDayExists(requestDate)) {
-                args.cancel = true;
-                alert('A Blocked Day exists for this day.');
-            } else if (isRemoteWork) {
-                if (!this.canAddRemoteWorkRequest(requestDate)) {
-                    args.cancel = true;
-                    alert(
-                        `You cannot add more than ${this.maxApprovedRequestsPerDay} approved remote work requests per day.`
-                    );
-                } else if (!this.canAddRemoteWorkRequestForMonth(requestDate)) {
-                    args.cancel = true;
-                    alert(
-                        `You cannot add more than ${this.maxApprovedRequestsPerMonth} approved remote work requests per month.`
-                    );
-                }
-            } else if (requestDate < new Date()) {
-                // Check if there is any existing pending remote work request for the same user
-                args.cancel = true;
-                alert(
-                    'You cannot add a remote work request for a date in the past.'
-                );
-                return;
-            } else if (this.hasPendingRemoteWorkRequest(this.user.idUser)) {
-                // Check if there is any existing pending remote work request for the same user
-                args.cancel = true;
-                alert('You already have a pending remote work request.');
+    
+            // Step 1: Validate request based on weekly pending limits
+            if (this.hasExceededPendingRequestsForWeek(requestDate)) {
+                this._fuseUtilsService.cancelPopup(args, 'You cannot add more than 2 pending remote work requests in the same week.');
                 return;
             }
-
-            // Store the event ID for editing purposes
+    
+            // Step 2: Validate against blocked days or existing remote work requests
+            if (isBlockedDay || isRemoteWork) {
+                this.checkEventSettings(args, status);
+            } else if (this.isRemoteWorkRequestExists(requestDate, this.user.idUser)) {
+                this._fuseUtilsService.cancelPopup(args, 'A remote work request already exists for this day.');
+                return;
+            } else if (this.isBlockedDayExists(requestDate)) {
+                this._fuseUtilsService.cancelPopup(args, 'A Blocked Day exists for this day.');
+                return;
+            }
+    
+            // Step 3: Additional validations for remote work requests
+            if (isRemoteWork) {
+                if (!this.canAddRemoteWorkRequest(requestDate)) {
+                    this._fuseUtilsService.cancelPopup(args, `You cannot add more than ${this.maxApprovedRequestsPerDay} approved remote work requests per day.`);
+                    return;
+                } else if (!this.canAddRemoteWorkRequestForMonth(requestDate)) {
+                    this._fuseUtilsService.cancelPopup(args, `You cannot add more than ${this.maxApprovedRequestsPerMonth} approved remote work requests per month.`);
+                    return;
+                }
+            }
+    
+            // Step 4: Prevent requests for past dates
+            if (requestDate < new Date()) {
+                this._fuseUtilsService.cancelPopup(args, 'You cannot add a remote work request for a date in the past.');
+                return;
+            }
+    
+            // Step 5: Store the event ID for editing purposes
             if (args.type === 'Editor' && event.IsRemoteWork) {
                 this.currentEditingEventId = event.Id as string;
             }
@@ -171,14 +169,16 @@ export class collaboratorSchedulerComponent implements OnInit {
     handleSaveEvent(eventData: Record<string, any>): void {
         // Assuming eventData is an array of events
         const event = eventData[0];
-        
+
         const remoteWorkRequest: RemoteWorkRequest = {
             user: this.user,
-            requestDate: this._fuseUtilsService.formatDateForServer(event.StartTime),
+            requestDate: this._fuseUtilsService.formatDateForServer(
+                event.StartTime
+            ),
             comment: event.Description || '', // Assuming Description is the comment
             requestStatus: RemoteWorkRequestStatus.PENDING,
         };
-    
+
         this.addRequest(remoteWorkRequest);
     }
 
@@ -387,7 +387,9 @@ export class collaboratorSchedulerComponent implements OnInit {
             .cancelRemoteWorkRequest(remoteWorkRequestId)
             .subscribe({
                 next: (RemoteWorkRequest: RemoteWorkRequest) => {
-                    this.handleOptimisticDelete(RemoteWorkRequest.idRemoteWorkRequest)
+                    this.handleOptimisticDelete(
+                        RemoteWorkRequest.idRemoteWorkRequest
+                    );
                     console.log(
                         'Remote work request deleted:',
                         RemoteWorkRequest
@@ -413,7 +415,7 @@ export class collaboratorSchedulerComponent implements OnInit {
                         'Remote Work Request added successfully:',
                         response
                     );
-                    this.onfetchData()
+                    this.onfetchData();
                 },
                 error: (error: any) => {
                     // Handle error response
@@ -455,15 +457,31 @@ export class collaboratorSchedulerComponent implements OnInit {
         );
     }
 
-    // Verify the limit of the collaborators onsite before adding a new remote work request
     canAddRemoteWorkRequest(date: Date): boolean {
-        const approvedRequestsOnDate = this.remoteWorkRequests.filter(
-            (request) =>
-                new Date(request.requestDate).toDateString() ===
-                    date.toDateString() &&
-                request.requestStatus === RemoteWorkRequestStatus.APPROVED
+        // Get the week range for the given date
+        const requestWeekRange = this._fuseUtilsService.getWeekRange(date);
+        console.log();
+        // Filter remote work requests within the same week and pending status
+        const pendingRequestsInSameWeek = this.remoteWorkRequests.filter(
+            (request) => {
+                const requestDate = new Date(request.requestDate);
+                const requestRange =
+                    this._fuseUtilsService.getWeekRange(requestDate);
+
+                // Check if the request date is within the same week and has a pending status
+                return (
+                    requestRange.startDate.getTime() ===
+                        requestWeekRange.startDate.getTime() &&
+                    requestRange.endDate.getTime() ===
+                        requestWeekRange.endDate.getTime() &&
+                    request.requestStatus === RemoteWorkRequestStatus.PENDING &&
+                    request.user.idUser === this.user.idUser
+                );
+            }
         );
-        return approvedRequestsOnDate.length < this.maxApprovedRequestsPerDay;
+
+        // Return true if less than 2 pending requests exist in the same week
+        return pendingRequestsInSameWeek.length < 2;
     }
 
     // Verify the limit of remote work requests for each month
@@ -499,5 +517,22 @@ export class collaboratorSchedulerComponent implements OnInit {
                 request.idRemoteWorkRequest !== Number(remoteWorkRequestId)
         );
         this.updateEventSettings();
+    }
+
+    // Helper method to check if the user has exceeded pending requests in the current week
+    hasExceededPendingRequestsForWeek(
+        requestDate: Date,
+    ): boolean {
+        const startOfWeek = this._fuseUtilsService.getStartOfWeek(requestDate);
+        const endOfWeek = this._fuseUtilsService.getEndOfWeek(requestDate);
+
+        const pendingRequestsThisWeek = this.remoteWorkRequests.filter(
+            (request) => {
+                const requestDate = new Date(request.requestDate);
+                return requestDate >= startOfWeek && requestDate <= endOfWeek;
+            }
+        );
+
+        return pendingRequestsThisWeek.length >= 2;
     }
 }
