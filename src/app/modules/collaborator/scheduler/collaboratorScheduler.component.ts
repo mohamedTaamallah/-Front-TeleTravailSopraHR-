@@ -67,7 +67,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         this.maxApprovedRequestsPerDay = this.user.userTeam.onsiteEmployees;
         this.maxApprovedRequestsPerMonth = this.user.remoteWorkBalance;
 
-        this.onfetchData();
+        this.onFetchData();
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -107,19 +107,12 @@ export class collaboratorSchedulerComponent implements OnInit {
             const isBlockedDay = event.IsBlockedDay;
             const isRemoteWork = event.IsRemoteWork;
             const status = event.Status;
+            const isStudyDay = this.user.studySchedule?.daysOfStudy.includes(requestDate.getDay() + 1);
+
 
             this.presetTitleAndDescription(args);
 
-            // Step 1: Validate request based on weekly pending limits
-            if (this.hasExceededPendingRequestsForWeek(requestDate)) {
-                this._fuseUtilsService.cancelPopup(
-                    args,
-                    'You cannot add more than 2 pending remote work requests in the same week.'
-                );
-                return;
-            }
-
-            // Step 2: Validate against blocked days or existing remote work requests
+            // Step 1: Validate against blocked days or existing remote work requests
             if (isBlockedDay || isRemoteWork) {
                 this.checkEventSettings(args, status);
             } else if (
@@ -136,10 +129,28 @@ export class collaboratorSchedulerComponent implements OnInit {
                     'A Blocked Day exists for this day.'
                 );
                 return;
-            }
-
-            // Step 3: Additional validations for remote work requests
-            if (isRemoteWork) {
+            } else if (this.hasExceededPendingRequestsForWeek(requestDate)) {
+                // Step 2: Validate request based on weekly pending limits
+                this._fuseUtilsService.cancelPopup(
+                    args,
+                    'You cannot add more than 2 pending remote work requests in the same week.'
+                );
+                return;
+            } else if (this.hasExceededPendingRequestsForMonth(requestDate)) {
+                // Step 2: Validate request based on weekly pending limits
+                this._fuseUtilsService.cancelPopup(
+                    args,
+                    'Remote work requests can only be added for the current month.'
+                );
+                return;
+            }else if (isStudyDay) {
+                this._fuseUtilsService.cancelPopup(
+                    args,
+                    'You cannot add a remote work request on a study day.'
+                );
+                return;
+            }// Step 3: Additional validations for remote work requests
+            else if (isRemoteWork) {
                 if (!this.canAddRemoteWorkRequestForMonth(requestDate)) {
                     this._fuseUtilsService.cancelPopup(
                         args,
@@ -291,6 +302,38 @@ export class collaboratorSchedulerComponent implements OnInit {
         }));
     }
 
+    // Transform the study days to events
+    transformStudyDaysToEvents(user: User): Record<string, any>[] {
+        const events: Record<string, any>[] = [];
+        const studyDays = user.studySchedule?.daysOfStudy || [];
+        const isTwoFirstWeek = user.studySchedule?.isTwoFirstWeek || false;
+
+    
+        // Loop through each day of the month and check if it's a study day
+        for (let month = 0; month < 12; month++) { // Loop through each month
+            const year = new Date().getFullYear();
+            const endOfMonth = new Date(year, month + 1, 0);
+    
+            for (let day = 1; day <= endOfMonth.getDate(); day++) {
+                const currentDate = new Date(year, month, day);
+                
+                if (this._fuseUtilsService.isInWeekRange(currentDate, isTwoFirstWeek) && studyDays.includes(currentDate.getDay() + 1)) {
+                    events.push({
+                        Id: `study_${month}_${day}`,
+                        Subject: `Study Day`,
+                        StartTime: new Date(currentDate.setHours(0, 0, 0, 0)),
+                        EndTime: new Date(currentDate.setHours(23, 59, 59, 999)),
+                        IsAllDay: true,
+                        IsStudyDay: true,
+                        User: user.fullName,
+                    });
+                }
+            }
+        }
+    
+        return events;
+    }
+
     // Merge the blocked days and remote requests into event settings
     updateEventSettings() {
         const blockedDaysEvents = this.transformBlockedDaysToEvents(
@@ -299,9 +342,13 @@ export class collaboratorSchedulerComponent implements OnInit {
         const remoteWorkEvents = this.transformRemoteWorkRequestsToEvents(
             this.remoteWorkRequests
         );
-
+        const studyDaysEvents = this.transformStudyDaysToEvents(this.user);
         this.eventSettings = {
-            dataSource: [...blockedDaysEvents, ...remoteWorkEvents],
+            dataSource: [
+                ...blockedDaysEvents,
+                ...remoteWorkEvents,
+                ...studyDaysEvents,
+            ],
             fields: {
                 id: 'Id',
                 subject: { name: 'Subject', validation: { required: true } },
@@ -335,6 +382,20 @@ export class collaboratorSchedulerComponent implements OnInit {
     // Render the cells in order to change the colors depending on the type of event
     onEventRendered(args: EventRenderedArgs): void {
         const DateCell = args.data.StartTime.toDateString();
+
+        // Check if the cell date is a study day
+        if (
+            this.user.isAlternate &&
+            this.user.studySchedule.daysOfStudy.some(
+                (day) =>
+                    new Date(
+                        this._fuseUtilsService.getDateForDayOfWeek(day)
+                    ).toDateString() === DateCell
+            )
+        ) {
+            args.element.style.backgroundColor = '#d1c4e9'; // Color for study days
+            console.log('^^^^^^^^' + args);
+        }
 
         // Check if the cell date is a blocked day
         if (
@@ -371,7 +432,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     // -----------------------------------------------------------------------------------------------------
 
     // Calls the get data method for the blocked days and remote request days in order to merge them dynamically
-    onfetchData(): void {
+    onFetchData(): void {
         const teamId = this.user.userTeam.idTeam;
         const userId = this.user.idUser;
 
@@ -429,7 +490,7 @@ export class collaboratorSchedulerComponent implements OnInit {
                         'Remote Work Request added successfully:',
                         response
                     );
-                    this.onfetchData();
+                    this.onFetchData();
                 },
                 error: (error: any) => {
                     // Handle error response
@@ -546,5 +607,14 @@ export class collaboratorSchedulerComponent implements OnInit {
         );
 
         return pendingRequestsThisWeek.length >= 2;
+    }
+
+    hasExceededPendingRequestsForMonth(requestDate: Date) {
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const eventMonth = requestDate.getMonth();
+        const eventYear = requestDate.getFullYear();
+
+        return currentMonth !== eventMonth || currentYear !== eventYear;
     }
 }

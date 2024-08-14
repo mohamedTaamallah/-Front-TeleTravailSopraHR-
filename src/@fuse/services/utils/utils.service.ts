@@ -108,4 +108,21 @@ export class FuseUtilsService {
         args.cancel = true;
         alert(message);
     }
+
+    //getting the related day for the student collaborator 
+    getDateForDayOfWeek(dayOfWeek: number): Date {
+        const today = new Date();
+        const day = today.getDay() || 7; // Sunday = 0, Monday = 1, etc.
+        const difference = dayOfWeek - day + (dayOfWeek < day ? 7 : 0);
+        return new Date(today.setDate(today.getDate() + difference));
+    }
+
+    //verify if the date in the week range 
+    isInWeekRange(date: Date, isTwoFirstWeek: boolean): boolean {
+        const dayOfMonth = date.getDate();
+        const isFirstTwoWeeks = dayOfMonth <= 14;
+        const isLastTwoWeeks = dayOfMonth >= 15 && dayOfMonth <= 28;
+
+        return isTwoFirstWeek ? isFirstTwoWeeks : isLastTwoWeeks;
+    };
 }
