@@ -44,7 +44,7 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         link : '/UsersList'
     },
     {
-        id   : 'example',
+        id   : 'TeamManagment',
         title: 'Team management ',
         type : 'basic',
         icon : 'heroicons_outline:user-group',
@@ -56,5 +56,12 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:calendar',
         link : '/RemoteWorkScheduler'
+    },
+    {
+        id   : 'RemoteWorkRequestList',
+        title: 'Remote Work Request List ',
+        type : 'basic',
+        icon : 'heroicons_outline:newspaper',
+        link : '/RemoteWorkRequestList'
     }
 ];

@@ -103,9 +103,10 @@ export class AuthSignInComponent implements OnInit {
                         break;
                     case Role.COLLABORATOR:
                         this._router.navigateByUrl("/RemoteWorkScheduler");
-
-
                         break;
+                    case Role.MANAGER:
+                            this._router.navigateByUrl("/RemoteWorkRequestList");
+                            break;
                     default:
 
                         break;

@@ -39,7 +39,7 @@ import { EnterpriseLayoutComponent } from 'app/layout/layouts/horizontal/enterpr
         SearchModule,
         ShortcutsModule,
         UserModule,
-        SharedModule
+        SharedModule,
     ],
     exports     : [
         EnterpriseLayoutComponent

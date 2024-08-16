@@ -103,9 +103,6 @@ export class collaboratorSchedulerComponent implements OnInit {
         const event = args.data;
         const requestDate = event.StartTime;
         const status = event.Status;
-        const isStudyDay = this.user.studySchedule?.daysOfStudy.includes(
-            requestDate.getDay() + 1
-        );
 
         this.presetTitleAndDescription(args);
         // If the target is the scheduler cell (date), apply the logic in the else block
@@ -222,18 +219,24 @@ export class collaboratorSchedulerComponent implements OnInit {
     isStudyDayCheck(date: Date): boolean {
         const dayOfWeek = date.getDay(); // Get the day of the week (0 = Sunday, 6 = Saturday)
         const weekOfMonth = Math.ceil(date.getDate() / 7); // Get the week number within the month
-    
+        // Exclude August (7 = August since months are 0-indexed)
+        if (date.getMonth() === 7) {
+            return false;
+        }
+
         // Determine if we are in the first two weeks or the last two weeks
         const isFirstTwoWeeks = weekOfMonth <= 2;
         const isLastTwoWeeks = weekOfMonth > 2;
-    
+
         // Check if the current week falls within the specified study weeks
-        if ((this.user.studySchedule.isTwoFirstWeek && isFirstTwoWeeks) ||
-            (!this.user.studySchedule.isTwoFirstWeek && isLastTwoWeeks)) {
+        if (
+            (this.user.studySchedule.isTwoFirstWeek && isFirstTwoWeeks) ||
+            (!this.user.studySchedule.isTwoFirstWeek && isLastTwoWeeks)
+        ) {
             // Check if the current day is one of the study days
             return this.user.studySchedule.daysOfStudy.includes(dayOfWeek);
         }
-    
+
         return false;
     }
     // Blocks the title and the description for the add
@@ -328,12 +331,16 @@ export class collaboratorSchedulerComponent implements OnInit {
         const studyDays = user.studySchedule?.daysOfStudy || [];
         const isTwoFirstWeek = user.studySchedule?.isTwoFirstWeek || false;
 
+
+
         // Loop through each day of the month and check if it's a study day
         for (let month = 0; month < 12; month++) {
             // Loop through each month
             const year = new Date().getFullYear();
             const endOfMonth = new Date(year, month + 1, 0);
-
+            if (month === 7) {
+                continue;
+            }
             for (let day = 1; day <= endOfMonth.getDate(); day++) {
                 const currentDate = new Date(year, month, day);
 
@@ -390,56 +397,61 @@ export class collaboratorSchedulerComponent implements OnInit {
     // Prevents the edit for the approved, refused and blocked days
     checkEventSettings(args: Record<string, any>, status: any) {
         const eventData = args.data;
+        
+        const quickPopup: HTMLElement = args.element.querySelector(
+            '.e-quick-popup-wrapper .e-event-popup'
+        );
+        const editButton: HTMLElement = quickPopup.querySelector(
+            '.e-header-icon-wrapper .e-edit'
+        );
+
         console.log('Event Data:', eventData);
         if (status != RemoteWorkRequestStatus.PENDING) {
-            const quickPopup: HTMLElement = args.element.querySelector(
-                '.e-quick-popup-wrapper .e-event-popup'
-            );
-            const editButton: HTMLElement = quickPopup.querySelector(
-                '.e-header-icon-wrapper .e-edit'
-            );
             const deleteButton: HTMLElement = quickPopup.querySelector(
                 '.e-header-icon-wrapper .e-delete'
             );
-
-            if (editButton) editButton.remove();
-            if (deleteButton) deleteButton.remove();
+            editButton.remove();
+            deleteButton.remove();
+        }
+        else{
+            editButton.remove();
         }
     }
 
     // Render the cells in order to change the colors depending on the type of event
     onEventRendered(args: EventRenderedArgs): void {
-        const DateCell = args.data.StartTime.toDateString();
-
+        const dateCell = new Date(args.data.StartTime).setHours(0, 0, 0, 0);
+    
         // Check if the cell date is a study day
         if (
             this.user.isAlternate &&
             this.user.studySchedule.daysOfStudy.some(
-                (day) =>
-                    new Date(
-                        this._fuseUtilsService.getDateForDayOfWeek(day)
-                    ).toDateString() === DateCell
+                (day) => {
+                    const studyDayDate = this._fuseUtilsService.getDateForDayOfWeek(day).setHours(0, 0, 0, 0);
+                    return studyDayDate === dateCell;
+                }
             )
+            
         ) {
+            console.log("$$$$$$$$$$$")
             args.element.style.backgroundColor = '#d1c4e9'; // Color for study days
-            console.log('^^^^^^^^' + args);
         }
-
+    
         // Check if the cell date is a blocked day
         if (
             this.blockedDays.some(
-                (day) => new Date(day.blockedDate).toDateString() === DateCell
+                (day) => new Date(day.blockedDate).setHours(0, 0, 0, 0) === dateCell
             )
         ) {
             args.element.style.backgroundColor = '#06b6d4';
         }
-
+    
         const request = this.remoteWorkRequests.find(
             (request) =>
-                new Date(request.requestDate).toDateString() === DateCell &&
+                new Date(request.requestDate).setHours(0, 0, 0, 0) === dateCell &&
                 Number(request.user.idUser) === this.user.idUser
         );
-
+    
         if (request) {
             switch (request.requestStatus) {
                 case RemoteWorkRequestStatus.REFUSED:
@@ -560,46 +572,6 @@ export class collaboratorSchedulerComponent implements OnInit {
         );
     }
 
-    canAddRemoteWorkRequest(date: Date): boolean {
-        const requestWeekRange = this._fuseUtilsService.getWeekRange(date);
-
-        // Fetch study days in the current week
-        const studyDaysInWeek = this.user.studySchedule?.daysOfStudy
-            .map((day) => this._fuseUtilsService.getDateForDayOfWeek(day))
-            .filter(
-                (date) =>
-                    date >= requestWeekRange.startDate &&
-                    date <= requestWeekRange.endDate
-            );
-
-        const pendingRequestsInSameWeek = this.remoteWorkRequests.filter(
-            (request) => {
-                const requestDate = new Date(request.requestDate);
-                const requestRange =
-                    this._fuseUtilsService.getWeekRange(requestDate);
-
-                return (
-                    requestRange.startDate.getTime() ===
-                        requestWeekRange.startDate.getTime() &&
-                    requestRange.endDate.getTime() ===
-                        requestWeekRange.endDate.getTime() &&
-                    request.requestStatus === RemoteWorkRequestStatus.PENDING &&
-                    request.user.idUser === this.user.idUser
-                );
-            }
-        );
-
-        // Check if there's a study day in the week
-        const hasStudyDayInWeek = studyDaysInWeek.length > 0;
-
-        // If there's a study day in the week, limit to one remote request
-        if (hasStudyDayInWeek) {
-            return pendingRequestsInSameWeek.length < 1;
-        }
-
-        return pendingRequestsInSameWeek.length < 2;
-    }
-
     // Verify the limit of remote work requests for each month
     canAddRemoteWorkRequestForMonth(date: Date): boolean {
         const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -660,10 +632,14 @@ export class collaboratorSchedulerComponent implements OnInit {
         return currentMonth !== eventMonth || currentYear !== eventYear;
     }
 
+    //checks if there is one pending request for a week with study days 
     canAddRemoteWorkRequestForWeek(date: Date): boolean {
         const weekStart = this._fuseUtilsService.getStartOfWeek(date);
         const weekEnd = this._fuseUtilsService.getEndOfWeek(date);
 
+        if(date.getMonth()===7){//no study days should be visible for August
+            return true 
+        }
         // Filter approved remote work requests for the same user in the given week
         const approvedRequestsInWeek = this.remoteWorkRequests.filter(
             (request) => {
@@ -671,8 +647,7 @@ export class collaboratorSchedulerComponent implements OnInit {
                 return (
                     requestDate >= weekStart &&
                     requestDate <= weekEnd &&
-                    request.requestStatus ===
-                        RemoteWorkRequestStatus.PENDING &&
+                    request.requestStatus === RemoteWorkRequestStatus.PENDING &&
                     request.user.idUser === this.user.idUser
                 );
             }

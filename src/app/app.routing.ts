@@ -93,5 +93,20 @@ export const appRoutes: Route[] = [
             {path: 'RemoteWorkScheduler', loadChildren: () => import('app/modules/collaborator/scheduler/collaboratorScheduler.module').then(m => m.collaboratorSchedulerModule)},
 
         ]
+    },
+    // Manager routes
+    {
+        path: '',
+        canMatch: [AuthGuard],
+        canActivate:[AuthorizationGuard],
+        data: { expectedRole: 'MANAGER' },
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        children: [
+            {path: 'RemoteWorkRequestList', loadChildren: () => import('app/modules/manager/RemoteWorkRequestList/RemoteWorkRequestList.module').then(m => m.RemoteWorkRequestListModule)},
+
+        ]
     }
 ];
