@@ -125,4 +125,25 @@ export class FuseUtilsService {
 
         return isTwoFirstWeek ? isFirstTwoWeeks : isLastTwoWeeks;
     };
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Remote work request  List manager   methods
+    // -----------------------------------------------------------------------------------------------------
+
+    //calculating the remaining time for the remote work request to be refused automatically 
+    calculateTimeRemaining(requestDate: string): string {
+        const requestDateTime = new Date(requestDate).getTime();
+        const currentDateTime = new Date().getTime();
+        const timeDifference = requestDateTime - currentDateTime;
+
+        if (timeDifference <= 0) {
+            return 'Expired';
+        }
+
+        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+
+        return `${days}d ${hours}h ${minutes}m`;
+    }
 }

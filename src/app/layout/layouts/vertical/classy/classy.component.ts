@@ -5,7 +5,7 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
 import { NavigationService } from 'app/core/navigation/navigation.service';
-import { UserService } from 'app/core/user/user.service';
+import { UserService } from 'app/core/services/user/user.service';
 import { User } from 'app/core/entities/User';
 
 @Component({

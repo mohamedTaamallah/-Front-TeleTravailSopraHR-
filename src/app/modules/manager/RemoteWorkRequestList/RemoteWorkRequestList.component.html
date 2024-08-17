@@ -1,43 +1,104 @@
+<!-- <div class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+    <div class="text-lg font-medium tracking-tight leading-6 truncate">Budget Details</div>
+    <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
+
+    </div>
+</div> -->
+
+
+
 <div class="flex flex-col flex-auto min-w-0">
     <!-- Main -->
     <div class="flex-auto p-6 sm:p-10">
         <!-- CONTENT GOES HERE -->
-        <div class="xl:col-span-2 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
-            <div class="p-6 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                <div class="text-lg font-large tracking-tight leading-6 truncate">
-                    Remote work Request List
-                </div>
-                <div class="flex items-center mt-4 sm:mt-0">
-                    <span class="text-secondary font-large mr-4"></span>
-                  </div>
-            </div>
-    
-            <div class="overflow-x-auto mx-6 mb-02">
-                <div class="control-section">
-                    <div class="col-lg-9 content-wrapper">
+        <div class="mt-4  h-150 min-h-50 max-h-300 border-2 rounded-2xl">
+            <ejs-grid
+                #grid
+                class="border-2 rounded-2xl"
+                [dataSource]="data"
+                height="400"
+                [allowFiltering]="true"
+                [allowGrouping]='true'
+                [filterSettings]="filterSettings"
+                [editSettings]="editSettings"
+                [toolbar]='toolbarOptions'
+                [allowPaging]="true"
+                [pageSettings]="PageSettings"
+                allowPaging='true' allowGrouping='true' allowSorting='true' showColumnMenu='true'
 
-                    </div>
+            >
+                <e-columns>
+                    <e-column
+                        field="user.fullName"
+                        headerText="Collaborator"
+                        width="120"
+                        textAlign="center"
+                        isPrimaryKey="true"
+                        [validationRules]="orderidrules"
+                    >
                 
-                    <div class="col-lg-3 property-section">
-                        <div class="property-panel-section">
-                            <div class="property-panel-content">
-                                <div id="property" class="property-panel-table" title="Properties">
-                                    <table id="property" title="Properties" style="width: 100%">
-                                        <tbody>
-                                            <tr style="height: 50px">
-                                                <td style="width: 100%;">
-                                                    <div></div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </e-column>
+                    <e-column
+                        field="user.isAlternate"
+                        headerText="Is Alternate"
+                        width="90"
+                        [validationRules]="customeridrules"
+                        isPrimaryKey="true"
+                    >
+                </e-column>
+                    <e-column
+                        field="user.email"
+                        headerText="Email"
+                        width="140"
+                        format="yMd"
+                        textAlign="left"
+                        isPrimaryKey="true"
+                    ></e-column>
+                    <e-column
+                        field="requestDate"
+                        headerText="Remote work Request date"
+                        width="180"
+                        textAlign="center"
+                        isPrimaryKey="true"
+                    ></e-column>
+                    <e-column
+                        field="timeRemaining"
+                        headerText="Time remaining "
+                        width="150"
+                        editType="dropdownedit"
+                        isPrimaryKey="true"
+                    ></e-column>
+                    <e-column
+                        field="requestStatus"
+                        headerText="Request Status"
+                        width="150"
+                        editType="dropdownedit"
+                    >
+                        <ng-template #template let-data>
+                            <span
+                                class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase"
+                                [ngClass]="{
+                                    'bg-amber-200 text-amber-800 dark:bg-amber-600 dark:text-amber-50': data.requestStatus== 'PENDING',
+                                    'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': data.requestStatus == 'APPROVED'
+                                }"
+                            >
+                                <span class="leading-relaxed whitespace-nowrap">{{ data.requestStatus }}</span>
+                            </span>
+                        </ng-template>
+
+                    </e-column>
+                </e-columns>
+
+            </ejs-grid>
         </div>
     </div>
-  </div>
-  
+</div>
+<!-- <div class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+    <div class="text-lg font-medium tracking-tight leading-6 truncate">Budget Details</div>
+    <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
+
+    </div>
+</div> -->
+
+
+

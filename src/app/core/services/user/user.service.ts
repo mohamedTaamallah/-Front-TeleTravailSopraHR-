@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, ReplaySubject, tap } from 'rxjs';
-import { User } from '../entities/User';
-import { SessionService } from '../auth/Session/session.service';
-import { AuthUtils } from '../auth/auth.utils';
-import { JwtTokenService } from '../auth/JWT/jwt-token.service';
-import { environment } from '../auth/Api/Apis';
-import { Team } from '../entities/Team';
+import { User } from '../../entities/User';
+import { SessionService } from '../../auth/Session/session.service';
+import { AuthUtils } from '../../auth/auth.utils';
+import { JwtTokenService } from '../../auth/JWT/jwt-token.service';
+import { environment } from '../../auth/Api/Apis';
+import { Team } from '../../entities/Team';
 
 @Injectable({
     providedIn: 'root',

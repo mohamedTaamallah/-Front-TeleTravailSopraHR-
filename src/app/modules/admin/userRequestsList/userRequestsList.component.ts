@@ -31,7 +31,7 @@ export class userRequestsListComponent {
     public editSettings?: EditSettingsModel;
     public editparams: Object;
     public Teams: Team[];
-public teamParams: Object;
+    public teamParams: Object;
 
     @ViewChild('grid') public grid?: GridComponent;
 

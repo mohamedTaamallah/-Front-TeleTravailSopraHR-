@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FuseConfirmationConfig } from '@fuse/services/confirmation';
 import { FuseValidators } from '@fuse/validators';
 import { Team } from 'app/core/entities/Team';
-import { User } from 'app/core/user/user.types';
+import { User } from 'app/core/services/user/user.types';
 import { EditTeamComponent } from '../../editTeam/editTeam.component';
 
 @Component({

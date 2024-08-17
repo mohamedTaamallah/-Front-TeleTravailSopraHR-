@@ -15,7 +15,7 @@ import { appConfig } from 'app/core/config/app.config';
 import { Role } from 'app/core/entities/Role';
 import { Team } from 'app/core/entities/Team';
 import { AdminService } from 'app/core/services/admin/admin.service';
-import { UserService } from 'app/core/user/user.service';
+import { UserService } from 'app/core/services/user/user.service';
 
 @Component({
     selector: 'auth-sign-in',

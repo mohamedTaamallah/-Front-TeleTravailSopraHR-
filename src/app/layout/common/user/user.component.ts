@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy
 import { Router } from '@angular/router';
 import { BooleanInput } from '@angular/cdk/coercion';
 import { delay, Subject, takeUntil } from 'rxjs';
-import { UserService } from 'app/core/user/user.service';
+import { UserService } from 'app/core/services/user/user.service';
 import { User } from 'app/core/entities/User';
 import { SessionService } from 'app/core/auth/Session/session.service';
 
