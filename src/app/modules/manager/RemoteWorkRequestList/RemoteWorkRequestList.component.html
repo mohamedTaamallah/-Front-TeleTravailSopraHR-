@@ -24,8 +24,11 @@
                 [toolbar]='toolbarOptions'
                 [allowPaging]="true"
                 [pageSettings]="PageSettings"
-                allowPaging='true' allowGrouping='true' allowSorting='true' showColumnMenu='true'
-
+                allowPaging='true' 
+                allowGrouping='true' 
+                allowSorting='true' 
+                showColumnMenu='true'
+                (toolbarClick)='approveAllRequests($event)'
             >
                 <e-columns>
                     <e-column
@@ -41,7 +44,7 @@
                     <e-column
                         field="user.isAlternate"
                         headerText="Is Alternate"
-                        width="90"
+                        width="100"
                         [validationRules]="customeridrules"
                         isPrimaryKey="true"
                     >

@@ -22,6 +22,32 @@ export class FuseConfirmationService
         actions    : {
             confirm: {
                 show : true,
+                label: 'Approve',
+                color: 'warn'
+            },
+            cancel : {
+                show : true,
+                label: 'Cancel'
+            }
+        },
+        dismissible: false
+    };
+
+    /**
+     * Confirmation dialog of the approve all remote work request
+     */
+
+    public _approveConfig: FuseConfirmationConfig = {
+        title      : 'Approve all Requests',
+        message    : 'Are you sure you want to approve all remote work requests ?',
+        icon       : {
+            show : true,
+            name : 'heroicons_outline:exclamation',
+            color: 'warn'
+        },
+        actions    : {
+            confirm: {
+                show : true,
                 label: 'Confirm',
                 color: 'warn'
             },

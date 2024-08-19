@@ -20,7 +20,7 @@ const exampleRoutes: Route[] = [
         
 
     ],
-    providers:[GroupService,EditService,SortService, GroupService, ColumnMenuService, PageService, FilterService]
+    providers:[GroupService,EditService,SortService, GroupService, ColumnMenuService, PageService, FilterService,ToolbarService]
 })
 export class RemoteWorkRequestListModule
 {

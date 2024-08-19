@@ -40,8 +40,7 @@ export class userRequestsListComponent {
      */
     constructor(
         private adminService: AdminService,
-        private _sessionService : SessionService
-    ) {       }
+    ) {}
 
     ngOnInit(): void {
 
