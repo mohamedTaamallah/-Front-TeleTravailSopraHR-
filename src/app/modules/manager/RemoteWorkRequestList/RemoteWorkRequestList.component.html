@@ -12,84 +12,38 @@
     <div class="flex-auto p-6 sm:p-10">
         <!-- CONTENT GOES HERE -->
         <div class="mt-4  h-150 min-h-50 max-h-300 border-2 rounded-2xl">
-            <ejs-grid
-                #grid
-                class="border-2 rounded-2xl"
-                [dataSource]="data"
-                height="400"
-                [allowFiltering]="true"
-                [allowGrouping]='true'
-                [filterSettings]="filterSettings"
-                [editSettings]="editSettings"
-                [toolbar]='toolbarOptions'
-                [allowPaging]="true"
-                [pageSettings]="PageSettings"
-                allowPaging='true' 
-                allowGrouping='true' 
-                allowSorting='true' 
-                showColumnMenu='true'
-                (toolbarClick)='approveAllRequests($event)'
-            >
+            <ejs-grid #grid
+            id="grid" class="border-2 rounded-2xl" [dataSource]="data" height="400" [allowFiltering]="true"
+                [allowGrouping]='true' [filterSettings]="filterSettings" [editSettings]="editSettings"
+                [toolbar]='toolbarOptions' [allowPaging]="true" [pageSettings]="PageSettings" allowPaging='true'
+                allowGrouping='true' allowSorting='true' showColumnMenu='true' (actionBegin)="actionBegin($event)"
+                (toolbarClick)='approveAllRequests($event)'>
                 <e-columns>
-                    <e-column
-                        field="user.fullName"
-                        headerText="Collaborator"
-                        width="120"
-                        textAlign="center"
-                        isPrimaryKey="true"
-                        [validationRules]="orderidrules"
-                    >
-                
-                </e-column>
-                    <e-column
-                        field="user.isAlternate"
-                        headerText="Is Alternate"
-                        width="100"
-                        [validationRules]="customeridrules"
-                        isPrimaryKey="true"
-                    >
-                </e-column>
-                    <e-column
-                        field="user.email"
-                        headerText="Email"
-                        width="140"
-                        format="yMd"
-                        textAlign="left"
-                        isPrimaryKey="true"
-                    ></e-column>
-                    <e-column
-                        field="requestDate"
-                        headerText="Remote work Request date"
-                        width="180"
-                        textAlign="center"
-                        isPrimaryKey="true"
-                    ></e-column>
-                    <e-column
-                        field="timeRemaining"
-                        headerText="Time remaining "
-                        width="150"
-                        editType="dropdownedit"
-                        isPrimaryKey="true"
-                    ></e-column>
-                    <e-column
-                        field="requestStatus"
-                        headerText="Request Status"
-                        width="150"
-                        editType="dropdownedit"
-                    >
-                        <ng-template #template let-data>
-                            <span
-                                class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase"
-                                [ngClass]="{
-                                    'bg-amber-200 text-amber-800 dark:bg-amber-600 dark:text-amber-50': data.requestStatus== 'PENDING',
-                                    'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50': data.requestStatus == 'APPROVED'
-                                }"
-                            >
-                                <span class="leading-relaxed whitespace-nowrap">{{ data.requestStatus }}</span>
-                            </span>
-                        </ng-template>
-
+                    <e-column field="user.fullName" headerText="Collaborator" width="120" textAlign="center"
+                        isPrimaryKey="true" [validationRules]="orderidrules">
                     </e-column>
+                    <e-column field="user.isAlternate" headerText="Is Alternate" width="100"
+                        [validationRules]="customeridrules" isPrimaryKey="true">
+                    </e-column>
+                    <e-column field="user.email" headerText="Email" width="140" format="yMd" textAlign="left"
+                        isPrimaryKey="true"></e-column>
+                    <e-column field="requestDate" headerText="Remote work Request date" width="180" textAlign="center"
+                        isPrimaryKey="true"></e-column>
+                    <e-column field="timeRemaining" headerText="Time remaining " width="150" editType="dropdownedit"
+                        isPrimaryKey="true"></e-column>
+                        <e-column field="requestStatus" headerText="requestStatus" width="150">
+                            <ng-template #editTemplate>
+                              <ejs-dropdownlist
+                                id="requestStatus"
+                                name="requestStatus"
+                                [dataSource]="statusOptions"
+                                [fields]="fields"
+                                [(value)]="updatedStatus"
+                                placeholder="Select Status"
+                              >
+                              </ejs-dropdownlist>
+                            </ng-template>
+                          </e-column>
                 </e-columns>
 
             </ejs-grid>
@@ -102,6 +56,3 @@
 
     </div>
 </div> -->
-
-
-

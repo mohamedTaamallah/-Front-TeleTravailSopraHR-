@@ -2,6 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'app/core/auth/Api/Apis';
 import { RemoteWorkRequest } from 'app/core/entities/RemoteWorkRequest';
+import { RemoteWorkRequestStatus } from 'app/core/entities/RemoteWorkRequestStatus';
+import { UpdateRemoteWorkRequest } from 'app/core/entities/requests/updateRemoteWorkRequest';
+import { Team } from 'app/core/entities/Team';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -15,16 +18,33 @@ export class ManagerService {
     constructor(private _httpClient: HttpClient) {}
 
     //Getting all the remote work request by managed team
-    getAllRemoteWorkRequestByTeam(
-        userID: number
-    ): Observable<RemoteWorkRequest[]> {
+    getAllRemoteWorkRequestByTeam(userID: number, statuses: String[]): Observable<RemoteWorkRequest[]> {
+        // Convert the statuses array to a query string
+        const statusParams = statuses.map(status => `statuses=${status}`).join('&');
         return this._httpClient.get<RemoteWorkRequest[]>(
-            `${this._remoteWorkRequestApiUrl}/getAllRemoteWorkRequestByTeam/${userID}`
+            `${this._remoteWorkRequestApiUrl}/getAllRemoteWorkRequestByTeam/${userID}?${statusParams}`
         );
     }
 
-    //Approving all the remote work requests 
-    approveAllRemoteWorkRequest(userID :number): Observable<RemoteWorkRequest[]> {
-      return this._httpClient.post<RemoteWorkRequest[]>(`${this._remoteWorkRequestApiUrl}/approveAllRemoteWorkRequest/${userID}`,'');
-  }
+    //Approving all the remote work requests
+    approveAllRemoteWorkRequest(
+        userID: number
+    ): Observable<RemoteWorkRequest[]> {
+        return this._httpClient.post<RemoteWorkRequest[]>(
+            `${this._remoteWorkRequestApiUrl}/approveAllRemoteWorkRequest/${userID}`,
+            ''
+        );
+    }
+
+    //Getting the team for the user
+    getTeamByUser(idUser: number): Observable<Team> {
+        return this._httpClient.get<Team>(
+            `${this._teamUrlApi}/getTeamByUser/${idUser}`
+        );
+    }
+
+    //updatin the current requests
+    updateRemoteWorkRequest(request: UpdateRemoteWorkRequest): Observable<RemoteWorkRequest> {
+        return this._httpClient.post<RemoteWorkRequest>(`${this._remoteWorkRequestApiUrl}/updateRemoteWorkRequest`, request);
+      }
 }

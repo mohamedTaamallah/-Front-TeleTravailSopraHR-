@@ -105,7 +105,8 @@ export const appRoutes: Route[] = [
             initialData: InitialDataResolver,
         },
         children: [
-            {path: 'RemoteWorkRequestList', loadChildren: () => import('app/modules/manager/RemoteWorkRequestList/RemoteWorkRequestList.module').then(m => m.RemoteWorkRequestListModule)},
+            {path: 'RemoteWorkRequestList', loadChildren: () => import('app/modules/manager/remoteWorkRequestList/RemoteWorkRequestList.module').then(m => m.RemoteWorkRequestListModule)},
+            {path: 'BlockedkDays', loadChildren: () => import('app/modules/manager/blockedDaysManagment/BlockedDaysManagment.module').then(m => m.BlockedDaysManagmentModule)},
 
         ]
     }

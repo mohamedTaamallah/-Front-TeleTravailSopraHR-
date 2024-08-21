@@ -1,11 +1,19 @@
 import { Injectable } from '@angular/core';
 import { IsActiveMatchOptions } from '@angular/router';
-import { PopupOpenEventArgs } from '@syncfusion/ej2-angular-schedule';
+import {
+    EventSettingsModel,
+    PopupOpenEventArgs,
+} from '@syncfusion/ej2-angular-schedule';
+import { BlockedDay } from 'app/core/entities/BlockedDay ';
+import { RemoteWorkRequest } from 'app/core/entities/RemoteWorkRequest';
+import { User } from 'app/core/entities/User';
 
 @Injectable({
     providedIn: 'root',
 })
 export class FuseUtilsService {
+
+    private user : User 
     /**
      * Constructor
      */
@@ -14,6 +22,110 @@ export class FuseUtilsService {
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Scheduler settings methods
+    // -----------------------------------------------------------------------------------------------------
+
+    // Transform the blocked Days to events
+    transformBlockedDaysToEvents(
+        blockedDays: BlockedDay[],
+        user: User
+    ): Record<string, any>[] {
+        return blockedDays.map((day) => ({
+            Id: `blocked_${day.idBlockedDay}`,
+            Subject: `Blocked Day [${day.reason}]`,
+            StartTime: new Date(day.blockedDate),
+            EndTime: new Date(day.blockedDate),
+            IsAllDay: true,
+            IsBlockedDay: true,
+            Reason: day.reason,
+            // Team: user.userTeam.teamName,
+        }));
+    }
+
+    // Transform the remote work requests to events
+    transformRemoteWorkRequestsToEvents(
+        remoteWorkRequests: RemoteWorkRequest[],
+        user: User
+    ): Record<string, any>[] {
+        return remoteWorkRequests.map((request) => ({
+            Id: `remote_${request.idRemoteWorkRequest}`,
+            Subject: `${request.user.fullName} [Remote Work]`,
+            StartTime: new Date(request.requestDate),
+            EndTime: new Date(request.requestDate),
+            IsAllDay: true,
+            IsRemoteWork: true,
+            Comment: request.comment,
+            Status: request.requestStatus,
+            User: user,
+        }));
+    }
+
+    // Transform the study days to events
+    transformStudyDaysToEvents(user: User): Record<string, any>[] {
+        const events: Record<string, any>[] = [];
+        const studyDays = user.studySchedule?.daysOfStudy || [];
+        const isTwoFirstWeek = user.studySchedule?.isTwoFirstWeek || false;
+
+        // Loop through each day of the month and check if it's a study day
+        for (let month = 0; month < 12; month++) {
+            // Loop through each month
+            const year = new Date().getFullYear();
+            const endOfMonth = new Date(year, month + 1, 0);
+            if (month === 7) {
+                continue;
+            }
+            for (let day = 1; day <= endOfMonth.getDate(); day++) {
+                const currentDate = new Date(year, month, day);
+
+                if (
+                    this.isInWeekRange(currentDate, isTwoFirstWeek) &&
+                    studyDays.includes(currentDate.getDay() + 1)
+                ) {
+                    events.push({
+                        Id: `study_${month}_${day}`,
+                        Subject: `Study Day`,
+                        StartTime: new Date(currentDate.setHours(0, 0, 0, 0)),
+                        EndTime: new Date(
+                            currentDate.setHours(23, 59, 59, 999)
+                        ),
+                        IsAllDay: true,
+                        IsStudyDay: true,
+                        User: user.fullName,
+                    });
+                }
+            }
+        }
+
+        return events;
+    }
+
+    updateEventSettings(
+        blockedDays: BlockedDay[],
+        remoteWorkRequests: RemoteWorkRequest[],
+        user: User,
+        eventSettings: EventSettingsModel
+    ): EventSettingsModel {
+        return {
+            ...eventSettings,
+            dataSource: [
+                ...this.transformBlockedDaysToEvents(blockedDays, user),
+                ...this.transformRemoteWorkRequestsToEvents(
+                    remoteWorkRequests,
+                    user
+                ),
+                ...this.transformStudyDaysToEvents(user),
+            ],
+            fields: {
+                id: 'Id',
+                subject: { name: 'Subject', validation: { required: true } },
+                isAllDay: { name: 'IsAllDay' },
+                startTime: { name: 'StartTime' },
+                endTime: { name: 'EndTime' },
+            },
+        };
+    }
 
     /**
      * Get the equivalent "IsActiveMatchOptions" options for "exact = true".
@@ -109,7 +221,7 @@ export class FuseUtilsService {
         alert(message);
     }
 
-    //getting the related day for the student collaborator 
+    //getting the related day for the student collaborator
     getDateForDayOfWeek(dayOfWeek: number): Date {
         const today = new Date();
         const day = today.getDay() || 7; // Sunday = 0, Monday = 1, etc.
@@ -117,20 +229,20 @@ export class FuseUtilsService {
         return new Date(today.setDate(today.getDate() + difference));
     }
 
-    //verify if the date in the week range 
+    //verify if the date in the week range
     isInWeekRange(date: Date, isTwoFirstWeek: boolean): boolean {
         const dayOfMonth = date.getDate();
         const isFirstTwoWeeks = dayOfMonth <= 14;
         const isLastTwoWeeks = dayOfMonth >= 15 && dayOfMonth <= 28;
 
         return isTwoFirstWeek ? isFirstTwoWeeks : isLastTwoWeeks;
-    };
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Remote work request  List manager   methods
     // -----------------------------------------------------------------------------------------------------
 
-    //calculating the remaining time for the remote work request to be refused automatically 
+    //calculating the remaining time for the remote work request to be refused automatically
     calculateTimeRemaining(requestDate: string): string {
         const requestDateTime = new Date(requestDate).getTime();
         const currentDateTime = new Date().getTime();
@@ -141,8 +253,12 @@ export class FuseUtilsService {
         }
 
         const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const hours = Math.floor(
+            (timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor(
+            (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
+        );
 
         return `${days}d ${hours}h ${minutes}m`;
     }

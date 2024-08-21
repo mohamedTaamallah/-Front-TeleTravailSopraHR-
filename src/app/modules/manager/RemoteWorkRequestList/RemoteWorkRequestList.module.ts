@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
-import { RemoteWorkRequestListComponent } from './RemoteWorkRequestList.component';
 import { GridModule, Filter, Sort, FilterService, ToolbarService, PageService,PrintEventArgs, EditService, ForeignKeyService, GroupService, Toolbar, ColumnMenuService, SortService } from '@syncfusion/ej2-angular-grids';
+import { RemoteWorkRequestListComponent } from './RemoteWorkRequestList.component';
+import {  DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 
 const exampleRoutes: Route[] = [
     {
@@ -17,8 +18,7 @@ const exampleRoutes: Route[] = [
     imports     : [
         RouterModule.forChild(exampleRoutes),
         GridModule,
-        
-
+        DropDownListModule
     ],
     providers:[GroupService,EditService,SortService, GroupService, ColumnMenuService, PageService, FilterService,ToolbarService]
 })

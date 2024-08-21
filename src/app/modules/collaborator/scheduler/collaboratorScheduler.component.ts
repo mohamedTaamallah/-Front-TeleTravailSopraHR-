@@ -62,6 +62,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        
         this.user = this.sessionService.getUser();
         this.maxApprovedRequestsPerDay = this.user.userTeam.onsiteEmployees;
         this.maxApprovedRequestsPerMonth = this.user.remoteWorkBalance;
@@ -104,7 +105,9 @@ export class collaboratorSchedulerComponent implements OnInit {
         const requestDate = event.StartTime;
         const status = event.Status;
 
-        this.presetTitleAndDescription(args);
+        if(args ){
+            this.presetTitleAndDescription(args);
+        }
         // If the target is the scheduler cell (date), apply the logic in the else block
         if (
             (args.type === 'Editor' || args.type === 'QuickInfo') &&
@@ -241,19 +244,18 @@ export class collaboratorSchedulerComponent implements OnInit {
     }
     // Blocks the title and the description for the add
     presetTitleAndDescription(args: PopupOpenEventArgs) {
+      
         const titleElement = args.element.querySelector(
             '.e-subject'
         ) as HTMLInputElement;
-        titleElement.value = `${this.user.fullName} [Remote Work]`;
-        titleElement.setAttribute('readonly', 'true');
+        if(titleElement){
+            titleElement.value = `${this.user.fullName} [Remote Work]`;
+            titleElement.setAttribute('readonly', 'true');
+        }
+    
 
         if (args.type === 'Editor') {
-            const descriptionElement = args.element.querySelector(
-                '.e-description'
-            ) as HTMLTextAreaElement;
-            descriptionElement.removeAttribute('readonly');
-        }
-        if (args.type === 'Editor') {
+
             // Lock the end time
             const endTimeElement = args.element.querySelector(
                 '.e-end'
@@ -292,38 +294,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         if (allDayElement) allDayElement.style.display = 'none';
     }
 
-    // Transform the blocked Days to events
-    transformBlockedDaysToEvents(
-        blockedDays: BlockedDay[]
-    ): Record<string, any>[] {
-        return blockedDays.map((day) => ({
-            Id: `blocked_${day.idBlockedDay}`,
-            Subject: `Blocked Day [${day.reason}]`,
-            StartTime: new Date(day.blockedDate),
-            EndTime: new Date(day.blockedDate),
-            IsAllDay: true,
-            IsBlockedDay: true,
-            Reason: day.reason,
-            Team: this.user.userTeam.teamName,
-        }));
-    }
 
-    // Transform the remote work requests to events
-    transformRemoteWorkRequestsToEvents(
-        remoteWorkRequests: RemoteWorkRequest[]
-    ): Record<string, any>[] {
-        return remoteWorkRequests.map((request) => ({
-            Id: `remote_${request.idRemoteWorkRequest}`,
-            Subject: `${request.user.fullName} [Remote Work]`,
-            StartTime: new Date(request.requestDate),
-            EndTime: new Date(request.requestDate),
-            IsAllDay: true,
-            IsRemoteWork: true,
-            Comment: request.comment,
-            Status: request.requestStatus,
-            User: this.user,
-        }));
-    }
 
     // Transform the study days to events
     transformStudyDaysToEvents(user: User): Record<string, any>[] {
@@ -370,29 +341,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     }
 
     // Merge the blocked days and remote requests into event settings
-    updateEventSettings() {
-        const blockedDaysEvents = this.transformBlockedDaysToEvents(
-            this.blockedDays
-        );
-        const remoteWorkEvents = this.transformRemoteWorkRequestsToEvents(
-            this.remoteWorkRequests
-        );
-        const studyDaysEvents = this.transformStudyDaysToEvents(this.user);
-        this.eventSettings = {
-            dataSource: [
-                ...blockedDaysEvents,
-                ...remoteWorkEvents,
-                ...studyDaysEvents,
-            ],
-            fields: {
-                id: 'Id',
-                subject: { name: 'Subject', validation: { required: true } },
-                isAllDay: { name: 'IsAllDay' },
-                startTime: { name: 'StartTime' },
-                endTime: { name: 'EndTime' },
-            },
-        };
-    }
+
 
     // Prevents the edit for the approved, refused and blocked days
     checkEventSettings(args: Record<string, any>, status: any) {
@@ -422,20 +371,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     onEventRendered(args: EventRenderedArgs): void {
         const dateCell = new Date(args.data.StartTime).setHours(0, 0, 0, 0);
     
-        // Check if the cell date is a study day
-        if (
-            this.user.isAlternate &&
-            this.user.studySchedule.daysOfStudy.some(
-                (day) => {
-                    const studyDayDate = this._fuseUtilsService.getDateForDayOfWeek(day).setHours(0, 0, 0, 0);
-                    return studyDayDate === dateCell;
-                }
-            )
-            
-        ) {
-            console.log("$$$$$$$$$$$")
-            args.element.style.backgroundColor = '#d1c4e9'; // Color for study days
-        }
+
     
         // Check if the cell date is a blocked day
         if (
@@ -485,7 +421,8 @@ export class collaboratorSchedulerComponent implements OnInit {
             next: ({ blockedDays, remoteWorkRequests }) => {
                 this.blockedDays = blockedDays;
                 this.remoteWorkRequests = remoteWorkRequests;
-                this.updateEventSettings();
+                this.eventSettings =this._fuseUtilsService.updateEventSettings(this.blockedDays,this.remoteWorkRequests,this.user,this.eventSettings);
+                console.log(this.eventSettings)
             },
             error: (error: any) => {
                 console.error('Error fetching data:', error);
@@ -604,7 +541,7 @@ export class collaboratorSchedulerComponent implements OnInit {
             (request) =>
                 request.idRemoteWorkRequest !== Number(remoteWorkRequestId)
         );
-        this.updateEventSettings();
+       this._fuseUtilsService.updateEventSettings(this.blockedDays,this.remoteWorkRequests,this.user, this.eventSettings );
     }
 
     // Helper method to check if the user has exceeded pending requests in the current week

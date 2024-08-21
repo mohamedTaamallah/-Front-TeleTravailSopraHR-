@@ -24,13 +24,6 @@ export class CollaboratorService {
         );
     }
 
-    //Getting the team for the user
-    getTeamByUser(idUser: number): Observable<Team> {
-        return this._httpClient.get<Team>(
-            `${this._teamApiUrl}/getTeamByUser/${idUser}`
-        );
-    }
-
     //Getting the remote work for the user
     getRemoteWorkRequestByUser(idUser: number) {
         return this._httpClient.get<RemoteWorkRequest[]>(

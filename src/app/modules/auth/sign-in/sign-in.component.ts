@@ -15,6 +15,7 @@ import { appConfig } from 'app/core/config/app.config';
 import { Role } from 'app/core/entities/Role';
 import { Team } from 'app/core/entities/Team';
 import { AdminService } from 'app/core/services/admin/admin.service';
+import { ManagerService } from 'app/core/services/manager/Manager.service';
 import { UserService } from 'app/core/services/user/user.service';
 
 @Component({
@@ -42,6 +43,8 @@ export class AuthSignInComponent implements OnInit {
         private _formBuilder: UntypedFormBuilder,
         private _router: Router,
         private _sessionService: SessionService,
+        private _managerService :  ManagerService,
+
 
     ) {}
 
@@ -105,6 +108,7 @@ export class AuthSignInComponent implements OnInit {
                         this._router.navigateByUrl("/RemoteWorkScheduler");
                         break;
                     case Role.MANAGER:
+                            this.getManagedTeam()
                             this._router.navigateByUrl("/RemoteWorkRequestList");
                             break;
                     default:
@@ -159,5 +163,22 @@ export class AuthSignInComponent implements OnInit {
     // -----------------------------------------------------------------------------------------------------
     // @ Users methods
     // -----------------------------------------------------------------------------------------------------
-    
+    getManagedTeam() {
+        this._managerService
+            .getTeamByUser(this._sessionService.getUser().idUser)
+            .subscribe({
+                next: (managedTeam: Team) => {
+                    let user = this._sessionService.getUser()
+                    user.managedTeam = managedTeam 
+                    this._sessionService.saveUser(user)
+                  
+                },
+                error: (error: any) => {
+                    console.error('Error getting manager team :', error);
+                },
+                complete: () => {
+                    console.log('Get complete');
+                },
+            });
+    }
 }

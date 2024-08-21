@@ -36,6 +36,7 @@ export const futuristicNavigation: FuseNavigationItem[] = [
     }
 ];
 export const horizontalNavigation: FuseNavigationItem[] = [
+    /* admin routes */
     {
         id   : 'UserList',
         title: 'Pending user Requests',
@@ -50,6 +51,7 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         icon : 'heroicons_outline:user-group',
         link : '/TeamManagment'
     },
+        /* Collaborator routes */
     {
         id   : 'RemoteWorkScheduler',
         title: 'Scheduler ',
@@ -57,11 +59,19 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         icon : 'heroicons_outline:calendar',
         link : '/RemoteWorkScheduler'
     },
+     /* Manager routes */
     {
         id   : 'RemoteWorkRequestList',
         title: 'Remote Work Request List ',
         type : 'basic',
         icon : 'heroicons_outline:newspaper',
         link : '/RemoteWorkRequestList'
+    },
+    {
+        id   : 'BlockedDaysManagment',
+        title: 'Blocked Days Managment ',
+        type : 'basic',
+        icon : 'heroicons_outline:newspaper',
+        link : '/BlockedkDays'
     }
 ];

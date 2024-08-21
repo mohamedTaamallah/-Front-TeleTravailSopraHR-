@@ -22,6 +22,7 @@ export class User {
   remoteWorkRequests?: RemoteWorkRequest[];
   userTeam?: Team;
   studySchedule?: StudySchedule;
+  managedTeam ?: Team
 
   // Implementations for UserDetails interface
   getAuthorities(): string[] {
