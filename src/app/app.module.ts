@@ -12,7 +12,6 @@ import { LayoutModule } from 'app/layout/layout.module';
 import { AppComponent } from 'app/app.component';
 import { appRoutes } from 'app/app.routing';
 import { CommonModule } from '@angular/common';
-import { AddTeamComponent } from './modules/admin/fullTeamMangmentElements/addTeam/add-team/add-team.component';
 import { FUSE_APP_CONFIG } from '@fuse/services/config/config.constants';
 
 const routerConfig: ExtraOptions = {
