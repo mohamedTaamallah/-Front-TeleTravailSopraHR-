@@ -194,6 +194,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         //this.updateRemoteWorkRequest(updateRequest);
     }
 
+    //handels the save process
     handleSaveEvent(eventData: Record<string, any>): void {
         // Assuming eventData is an array of events
         const event = eventData[0];

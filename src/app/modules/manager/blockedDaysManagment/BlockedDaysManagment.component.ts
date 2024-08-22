@@ -66,75 +66,51 @@ export class BlockedDaysManagment {
     // -----------------------------------------------------------------------------------------------------
     // @ Scheduler settings methods
     // -----------------------------------------------------------------------------------------------------
+
+    // Controls the trigger on action edit delete or add
+    onActionBegin(args: ActionEventArgs): void {
+        const eventData = args.data;
+
+        if (args.requestType === 'eventRemove') {
+        }
+        // Handle save event
+        if (args.requestType === 'eventSave') {
+
+        }
+        if (args.requestType === 'eventCreate') {
+            this.handleSaveEvent(eventData);
+        }
+    }
+
     onPopupOpen(args: PopupOpenEventArgs): void {
         const event = args.data;
         const requestDate = event.StartTime;
-        const status = event.Status;
-        const IsRemoteWork = event.IsRemoteWork
-
-
-              
-         // If the target is the scheduler cell (date), apply the logic in the else block
+        const IsRemoteWork = event.IsRemoteWork;
+        // If the target is the scheduler cell (date), apply the logic in the else block
         if (
             (args.type === 'Editor' || args.type === 'QuickInfo') &&
             !args.target.classList.contains('e-appointment')
         ) {
             // Logic for clicking on a date in the scheduler
-        if (this.isBlockedDayExists(requestDate)) {
+            if (this.isBlockedDayExists(requestDate)) {
                 this._fuseUtilsService.cancelPopup(
                     args,
                     'A remote work request already exists for this day.'
                 );
                 return;
-            } 
-
-        }
-        else[
-            this.checkEventSettings(args,IsRemoteWork)         
-        ]
-                    
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Data treatment  methods
-    // -----------------------------------------------------------------------------------------------------
-
-    // Calls the get data method for the blocked days and remote request days in order to merge them dynamically
-    onFetchData(): void {
-        forkJoin({
-            blockedDays: this.collaboratorService.getAllBlockedDaysByTeam(
-                this.user.managedTeam.idTeam
-            ),
-            remoteWorkRequests:
-                this.managerService.getAllRemoteWorkRequestByTeam(
-                    this.user.idUser,
-                    ['REFUSED', 'APPROVED']
-                ),
-        }).subscribe({
-            next: ({ blockedDays, remoteWorkRequests }) => {
-                this.blockedDays = blockedDays;
-                this.remoteWorkRequests = remoteWorkRequests;
-                console.log(this.blockedDays);
-                console.log(this.remoteWorkRequests);
-                this.eventSettings = this._fuseUtilsService.updateEventSettings(
-                    blockedDays,
-                    remoteWorkRequests,
-                    this.user,
-                    this.eventSettings
+            }
+            if (requestDate < new Date()) {
+                this._fuseUtilsService.cancelPopup(
+                    args,
+                    'You cannot add a blocked day for a date in the past.'
                 );
-                console.log(this.eventSettings);
-            },
-            error: (error: any) => {
-                console.error('Error fetching data:', error);
-            },
-            complete: () => {
-                console.log('Data fetch complete');
-            },
-        });
+                return;
+            }
+        } else this.checkEventSettings(args, IsRemoteWork);
     }
 
     // Prevents the edit for the approved, refused and blocked days
-    checkEventSettings(args: Record<string, any>,IsRemoteWork : boolean) {
+    checkEventSettings(args: Record<string, any>, IsRemoteWork: boolean) {
         const eventData = args.data;
 
         const quickPopup: HTMLElement = args.element.querySelector(
@@ -158,16 +134,12 @@ export class BlockedDaysManagment {
 
     // Verify if the current date has an already remote request for the same user
     isBlockedDayExists(date: Date): boolean {
-        console.log(this.blockedDays)
-        console.log(date)
-
         return this.blockedDays.some(
             (request) =>
                 new Date(request.blockedDate).toDateString() ===
-                    date.toDateString()
+                date.toDateString()
         );
     }
-
 
     // Render the cells in order to change the colors depending on the type of event
     onEventRendered(args: EventRenderedArgs): void {
@@ -185,8 +157,7 @@ export class BlockedDaysManagment {
 
         const request = this.remoteWorkRequests.find(
             (request) =>
-                new Date(request.requestDate).setHours(0, 0, 0, 0) ===
-                    dateCell && Number(request.user.idUser) === this.user.idUser
+                new Date(request.requestDate).setHours(0, 0, 0, 0) === dateCell
         );
 
         if (request) {
@@ -199,5 +170,72 @@ export class BlockedDaysManagment {
                     break;
             }
         }
+    }
+
+    //handels the save process
+    handleSaveEvent(eventData: Record<string, any>): void {
+        // Assuming eventData is an array of events
+        const event = eventData[0];
+
+        const blockedDay: BlockedDay = {
+            blockedDate: this._fuseUtilsService.formatDateForServer(
+                event.StartTime
+            ),
+            reason: event.Title || '', // Title for the blocked Day
+        };
+
+        this.addBlockedDayToATeam(blockedDay);
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Data treatment  methods
+    // -----------------------------------------------------------------------------------------------------
+
+    // Calls the get data method for the blocked days and remote request days in order to merge them dynamically
+    onFetchData(): void {
+        forkJoin({
+            blockedDays: this.collaboratorService.getAllBlockedDaysByTeam(
+                this.user.managedTeam.idTeam
+            ),
+            remoteWorkRequests:
+                this.managerService.getAllRemoteWorkRequestByTeam(
+                    this.user.idUser,
+                    ['REFUSED', 'APPROVED']
+                ),
+        }).subscribe({
+            next: ({ blockedDays, remoteWorkRequests }) => {
+                this.blockedDays = blockedDays;
+                this.remoteWorkRequests = remoteWorkRequests;
+
+                this.eventSettings = this._fuseUtilsService.updateEventSettings(
+                    blockedDays,
+                    remoteWorkRequests,
+                    this.user,
+                    this.eventSettings
+                );
+            },
+            error: (error: any) => {
+                console.error('Error fetching data:', error);
+            },
+            complete: () => {
+                console.log('Data fetch complete');
+            },
+        });
+    }
+
+    addBlockedDayToATeam(blockedDay: BlockedDay) {
+        this.managerService
+            .addBlockedDay(this.user.managedTeam.idTeam, blockedDay)
+            .subscribe({
+                next: (response: BlockedDay) => {
+                    console.log(
+                        'The Blocked has been added sucessfully',
+                        response
+                    );
+                },
+                error: (err: any) => {
+                    console.log('The Blocked has been added sucessfully', err);
+                },
+            });
     }
 }

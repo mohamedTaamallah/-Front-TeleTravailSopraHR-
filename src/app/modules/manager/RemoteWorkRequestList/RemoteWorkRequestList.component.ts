@@ -4,7 +4,6 @@ import { FuseUtilsService } from '@fuse/services/utils';
 import {
     EditSettingsModel,
     FilterSettingsModel,
-    SaveEventArgs,
     ToolbarItems,
 } from '@syncfusion/ej2-angular-grids';
 import { ToolbarItemModel } from '@syncfusion/ej2-angular-schedule';
@@ -14,7 +13,6 @@ import { RemoteWorkRequest } from 'app/core/entities/RemoteWorkRequest';
 import { RemoteWorkRequestStatus } from 'app/core/entities/RemoteWorkRequestStatus';
 import { UpdateRemoteWorkRequest } from 'app/core/entities/requests/updateRemoteWorkRequest';
 import { User } from 'app/core/entities/User';
-import { CollaboratorService } from 'app/core/services/collaborator/collaborator.service';
 import { ManagerService } from 'app/core/services/manager/Manager.service';
 
 @Component({
@@ -87,19 +85,13 @@ export class RemoteWorkRequestListComponent implements OnInit {
             // Retrieve the updated row data
             const updatedRow = args.data as RemoteWorkRequest;
 
-            // Access the dropdown value from the updated row data
-            updatedRow.requestStatus = this.updatedStatus;
+            //updating the current element form the drop down to the table 
+            this.updateCurrentElementTable(updatedRow)
 
-            // Optionally, update your data source with the new value
-            const rowIndex = this.data.findIndex(
-                (item) =>
-                    item.idRemoteWorkRequest === updatedRow.idRemoteWorkRequest
+            this.approveARemoteWorkRequest(
+                updatedRow.idRemoteWorkRequest,
+                this.updatedStatus
             );
-            if (rowIndex > -1) {
-                this.data[rowIndex] = { ...this.data[rowIndex], ...updatedRow };
-            }
-
-            this.approveARemoteWorkRequest(updatedRow.idRemoteWorkRequest,this.updatedStatus)
         }
     }
 
@@ -113,6 +105,7 @@ export class RemoteWorkRequestListComponent implements OnInit {
         }
     }
 
+    //confirmation for accepting all the remote work Requests 
     openAddDialog(): void {
         const dialogRef2 = this._fuseConfirmationService.open(
             this._fuseConfirmationService._approveConfig
@@ -126,6 +119,21 @@ export class RemoteWorkRequestListComponent implements OnInit {
                 }
             }
         });
+    }
+
+    //Updating a local element in the table 
+    updateCurrentElementTable(updatedRow : any) {
+        // Access the dropdown value from the updated row data
+        updatedRow.requestStatus = this.updatedStatus;
+
+        // Optionally, update your data source with the new value
+        const rowIndex = this.data.findIndex(
+            (item) =>
+                item.idRemoteWorkRequest === updatedRow.idRemoteWorkRequest
+        );
+        if (rowIndex > -1) {
+            this.data[rowIndex] = { ...this.data[rowIndex], ...updatedRow };
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------

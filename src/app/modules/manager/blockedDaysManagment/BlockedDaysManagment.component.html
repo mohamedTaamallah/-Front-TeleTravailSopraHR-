@@ -5,7 +5,7 @@
         <div class="xl:col-span-2 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
             <div class="p-6 flex flex-col sm:flex-row sm:justify-between sm:items-center">
                 <div class="text-lg font-large tracking-tight leading-6 truncate">
-                    Remote work scheduler
+                    Blocked Days managment
                 </div>
                 <div class="flex items-center mt-4 sm:mt-0">
                     <span class="text-secondary font-large mr-4"></span>
@@ -25,9 +25,8 @@
                             [views]="views"
                             (eventRendered)="onEventRendered($event)"
                             (popupOpen)="onPopupOpen($event)"
+                            (actionBegin)="onActionBegin($event)"
                             >
-  
-                            
                         </ejs-schedule>
                     </div>
                 
