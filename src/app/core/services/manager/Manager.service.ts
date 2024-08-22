@@ -62,11 +62,21 @@ export class ManagerService {
     //adding a new blocked day to a team
     addBlockedDay(
         teamID: number,
-        blockedDay : BlockedDay
+        blockedDay: BlockedDay
     ): Observable<BlockedDay> {
         return this._httpClient.post<BlockedDay>(
             `${this._teamUrlApi}/addBlockedDayToTeam/${teamID}`,
             blockedDay
+        );
+    }
+
+    //adding a new blocked day to a team
+    removeBlockedDay(
+        teamID: number,
+        blockedDayID: number
+    ): Observable<BlockedDay> {
+        return this._httpClient.delete<BlockedDay>(
+            `${this._teamUrlApi}/removeBlockedDayFromTeam/${teamID}/${blockedDayID}`
         );
     }
 }

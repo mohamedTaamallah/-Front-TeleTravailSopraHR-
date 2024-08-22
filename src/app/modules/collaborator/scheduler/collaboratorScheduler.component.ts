@@ -81,7 +81,6 @@ export class collaboratorSchedulerComponent implements OnInit {
             const eventId = event.Id as string;
             if (eventId.startsWith('remote_')) {
                 const remoteWorkRequestId = eventId.split('_')[1];
-                console.log(remoteWorkRequestId);
 
                 this.onDeleteRemoteWorkRequest(remoteWorkRequestId);
             }
@@ -296,50 +295,6 @@ export class collaboratorSchedulerComponent implements OnInit {
     }
 
 
-
-    // Transform the study days to events
-    transformStudyDaysToEvents(user: User): Record<string, any>[] {
-        const events: Record<string, any>[] = [];
-        const studyDays = user.studySchedule?.daysOfStudy || [];
-        const isTwoFirstWeek = user.studySchedule?.isTwoFirstWeek || false;
-
-
-
-        // Loop through each day of the month and check if it's a study day
-        for (let month = 0; month < 12; month++) {
-            // Loop through each month
-            const year = new Date().getFullYear();
-            const endOfMonth = new Date(year, month + 1, 0);
-            if (month === 7) {
-                continue;
-            }
-            for (let day = 1; day <= endOfMonth.getDate(); day++) {
-                const currentDate = new Date(year, month, day);
-
-                if (
-                    this._fuseUtilsService.isInWeekRange(
-                        currentDate,
-                        isTwoFirstWeek
-                    ) &&
-                    studyDays.includes(currentDate.getDay() + 1)
-                ) {
-                    events.push({
-                        Id: `study_${month}_${day}`,
-                        Subject: `Study Day`,
-                        StartTime: new Date(currentDate.setHours(0, 0, 0, 0)),
-                        EndTime: new Date(
-                            currentDate.setHours(23, 59, 59, 999)
-                        ),
-                        IsAllDay: true,
-                        IsStudyDay: true,
-                        User: user.fullName,
-                    });
-                }
-            }
-        }
-
-        return events;
-    }
 
     // Merge the blocked days and remote requests into event settings
 

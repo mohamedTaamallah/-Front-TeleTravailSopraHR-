@@ -72,10 +72,15 @@ export class BlockedDaysManagment {
         const eventData = args.data;
 
         if (args.requestType === 'eventRemove') {
+            const event = args.data[0];
+            const eventId = event.Id as string;
+            if (eventId.startsWith('blocked_')) {
+                const blockedDayId = eventId.split('_')[1];
+                this.onDeleteRemoteWorkRequest(blockedDayId);
+            }
         }
         // Handle save event
         if (args.requestType === 'eventSave') {
-
         }
         if (args.requestType === 'eventCreate') {
             this.handleSaveEvent(eventData);
@@ -95,7 +100,7 @@ export class BlockedDaysManagment {
             if (this.isBlockedDayExists(requestDate)) {
                 this._fuseUtilsService.cancelPopup(
                     args,
-                    'A remote work request already exists for this day.'
+                    'A blocked day request already exists for this day.'
                 );
                 return;
             }
@@ -181,10 +186,24 @@ export class BlockedDaysManagment {
             blockedDate: this._fuseUtilsService.formatDateForServer(
                 event.StartTime
             ),
-            reason: event.Title || '', // Title for the blocked Day
+            reason: event.Subject, // Title for the blocked Day
         };
 
         this.addBlockedDayToATeam(blockedDay);
+    }
+
+    // Optimistically delete the request from the UI
+    handleOptimisticDelete(remoteWorkRequestId: number): void {
+        this.blockedDays = this.blockedDays.filter(
+            (request) =>
+                request.idBlockedDay !== Number(remoteWorkRequestId)
+        );
+        this._fuseUtilsService.updateEventSettings(
+            this.blockedDays,
+            this.remoteWorkRequests,
+            this.user,
+            this.eventSettings
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -223,6 +242,7 @@ export class BlockedDaysManagment {
         });
     }
 
+    //Handels the process for adding a blocked day to a team
     addBlockedDayToATeam(blockedDay: BlockedDay) {
         this.managerService
             .addBlockedDay(this.user.managedTeam.idTeam, blockedDay)
@@ -235,6 +255,29 @@ export class BlockedDaysManagment {
                 },
                 error: (err: any) => {
                     console.log('The Blocked has been added sucessfully', err);
+                },
+            });
+    }
+
+    // Handles the deletion of a blocked day
+    onDeleteRemoteWorkRequest(blockedDayID: any) {
+        this.managerService
+            .removeBlockedDay(this.user.managedTeam.idTeam, blockedDayID)
+            .subscribe({
+                next: (response: BlockedDay) => {
+                    this.handleOptimisticDelete(
+                        response.idBlockedDay
+                    );
+                    console.log(
+                        'Blocked Day request deleted:',
+                        RemoteWorkRequest
+                    );
+                },
+                error: (error: any) => {
+                    console.error('Error deleting blocked day request:', error);
+                },
+                complete: () => {
+                    console.log('Delete complete');
                 },
             });
     }
