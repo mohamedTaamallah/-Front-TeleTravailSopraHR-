@@ -52,6 +52,8 @@ export class NotificationsComponent implements OnInit, OnDestroy
                 // Load the notifications
                 this.notifications = notifications;
 
+                console.log(this.notifications)
+
                 // Calculate the unread count
                 this._calculateUnreadCount();
 
@@ -124,10 +126,11 @@ export class NotificationsComponent implements OnInit, OnDestroy
     toggleRead(notification: Notification): void
     {
         // Toggle the read status
-        notification.read = !notification.read;
+        notification.isRead = !notification.isRead;
 
         // Update the notification
-        this._notificationsService.update(notification.id, notification).subscribe();
+        this._notificationsService.update(notification.id).subscribe();
+        this._calculateUnreadCount()
     }
 
     /**
@@ -139,16 +142,7 @@ export class NotificationsComponent implements OnInit, OnDestroy
         this._notificationsService.delete(notification.id).subscribe();
     }
 
-    /**
-     * Track by function for ngFor loops
-     *
-     * @param index
-     * @param item
-     */
-    trackByFn(index: number, item: any): any
-    {
-        return item.id || index;
-    }
+
 
     // -----------------------------------------------------------------------------------------------------
     // @ Private methods
@@ -213,8 +207,9 @@ export class NotificationsComponent implements OnInit, OnDestroy
 
         if ( this.notifications && this.notifications.length )
         {
-            count = this.notifications.filter(notification => !notification.read).length;
+            count = this.notifications.filter(notification => !notification.isRead).length;
         }
+        
 
         this.unreadCount = count;
     }

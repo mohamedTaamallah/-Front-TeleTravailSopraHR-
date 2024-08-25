@@ -50,7 +50,7 @@
             <ng-container *ngFor="let notification of notifications; trackBy: trackByFn">
                 <div
                     class="flex group hover:bg-gray-50 dark:hover:bg-black dark:hover:bg-opacity-5"
-                    [ngClass]="{'unread': !notification.read}">
+                    [ngClass]="{'unread': !notification.isRead}">
 
                     <!-- Notification with a link -->
                     <ng-container *ngIf="notification.link">
@@ -109,11 +109,11 @@
                 <!-- Notification content template -->
                 <ng-template #notificationContent>
                     <!-- Icon -->
-                    <ng-container *ngIf="notification.icon && !notification.image">
+                    <ng-container>
                         <div class="flex shrink-0 items-center justify-center w-8 h-8 mr-4 rounded-full bg-gray-100 dark:bg-gray-700">
                             <mat-icon
                                 class="icon-size-5"
-                                [svgIcon]="notification.icon">
+                                [svgIcon]="'heroicons_outline:bell'">
                             </mat-icon>
                         </div>
                     </ng-container>
@@ -126,15 +126,15 @@
                     </ng-container>
                     <!-- Title, description & time -->
                     <div class="flex flex-col flex-auto">
-                        <ng-container *ngIf="notification.title">
+                        <ng-container>
                             <div
                                 class="font-semibold line-clamp-1"
-                                [innerHTML]="notification.title"></div>
+                                ><p>Remote Work Request Update</p></div>
                         </ng-container>
-                        <ng-container *ngIf="notification.description">
+                        <ng-container *ngIf="notification.message">
                             <div
                                 class="line-clamp-2"
-                                [innerHTML]="notification.description"></div>
+                                [innerHTML]="notification.message"></div>
                         </ng-container>
                         <div class="mt-2 text-sm leading-none text-secondary">
                             {{notification.time | date:'MMM dd, h:mm a'}}

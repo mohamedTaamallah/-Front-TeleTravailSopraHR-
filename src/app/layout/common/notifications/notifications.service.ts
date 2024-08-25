@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, ReplaySubject, switchMap, take, tap } from 'rxjs';
 import { Notification } from 'app/layout/common/notifications/notifications.types';
+import { SessionService } from 'app/core/auth/Session/session.service';
+import { environment } from 'app/core/auth/Api/Apis';
 
 @Injectable({
     providedIn: 'root'
@@ -9,11 +11,12 @@ import { Notification } from 'app/layout/common/notifications/notifications.type
 export class NotificationsService
 {
     private _notifications: ReplaySubject<Notification[]> = new ReplaySubject<Notification[]>(1);
+    private _notifcaitonApiUrl : String = environment.NotifcaitonApiUrl
 
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient)
+    constructor(private _httpClient: HttpClient,private _sessionService : SessionService)
     {
     }
 
@@ -35,10 +38,11 @@ export class NotificationsService
 
     /**
      * Get all notifications
-     */
+    */
     getAll(): Observable<Notification[]>
     {
-        return this._httpClient.get<Notification[]>('api/common/notifications').pipe(
+        return this._httpClient.get<Notification[]>(
+            `${this._notifcaitonApiUrl}/getNotifications/${this._sessionService.getUser().idUser}`).pipe(
             tap((notifications) => {
                 this._notifications.next(notifications);
             })
@@ -73,18 +77,16 @@ export class NotificationsService
      * @param id
      * @param notification
      */
-    update(id: string, notification: Notification): Observable<Notification>
+    update(notificationId: string): Observable<Notification>
     {
         return this.notifications$.pipe(
             take(1),
-            switchMap(notifications => this._httpClient.patch<Notification>('api/common/notifications', {
-                id,
-                notification
+            switchMap(notifications => this._httpClient.post<Notification>(`${this._notifcaitonApiUrl}/markAsRead/${notificationId}`, {
             }).pipe(
                 map((updatedNotification: Notification) => {
 
                     // Find the index of the updated notification
-                    const index = notifications.findIndex(item => item.id === id);
+                    const index = notifications.findIndex(item => item.id === notificationId);
 
                     // Update the notification
                     notifications[index] = updatedNotification;
@@ -104,15 +106,15 @@ export class NotificationsService
      *
      * @param id
      */
-    delete(id: string): Observable<boolean>
+    delete(notificationId: string): Observable<Notification>
     {
         return this.notifications$.pipe(
             take(1),
-            switchMap(notifications => this._httpClient.delete<boolean>('api/common/notifications', {params: {id}}).pipe(
-                map((isDeleted: boolean) => {
+            switchMap(notifications => this._httpClient.delete<Notification>(`${this._notifcaitonApiUrl}/deleteNotification/${notificationId}`,).pipe(
+                map((DeletedNotification: Notification) => {
 
                     // Find the index of the deleted notification
-                    const index = notifications.findIndex(item => item.id === id);
+                    const index = notifications.findIndex(item => item.id === notificationId);
 
                     // Delete the notification
                     notifications.splice(index, 1);
@@ -121,7 +123,7 @@ export class NotificationsService
                     this._notifications.next(notifications);
 
                     // Return the deleted status
-                    return isDeleted;
+                    return DeletedNotification;
                 })
             ))
         );
@@ -139,7 +141,7 @@ export class NotificationsService
 
                     // Go through all notifications and set them as read
                     notifications.forEach((notification, index) => {
-                        notifications[index].read = true;
+                        notifications[index].isRead = true;
                     });
 
                     // Update the notifications
