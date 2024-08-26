@@ -107,6 +107,7 @@ export const appRoutes: Route[] = [
         children: [
             {path: 'RemoteWorkRequestList', loadChildren: () => import('app/modules/manager/remoteWorkRequestList/RemoteWorkRequestList.module').then(m => m.RemoteWorkRequestListModule)},
             {path: 'BlockedkDays', loadChildren: () => import('app/modules/manager/blockedDaysManagment/BlockedDaysManagment.module').then(m => m.BlockedDaysManagmentModule)},
+            {path: 'TeamMembers', loadChildren: () => import('app/modules/manager/team managment/teamMemberTable/TeamHandle.module').then(m => m.TeamHandleModule)},
 
         ]
     }

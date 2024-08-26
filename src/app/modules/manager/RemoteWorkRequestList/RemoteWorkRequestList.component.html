@@ -45,7 +45,12 @@
                             </ng-template>
                           </e-column>
                 </e-columns>
-
+                <ng-template #emptyRecordTemplate>
+                    <div class='emptyRecordTemplate'>
+                        <img class="h-10" [src]="imageSrc()" class="e-emptyRecord" alt="No record">
+                        <span>There is no data available to display at the moment.</span>
+                    </div>
+                </ng-template>
             </ejs-grid>
         </div>
     </div>

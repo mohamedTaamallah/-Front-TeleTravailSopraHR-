@@ -14,6 +14,8 @@ import { appRoutes } from 'app/app.routing';
 import { CommonModule } from '@angular/common';
 import { FUSE_APP_CONFIG } from '@fuse/services/config/config.constants';
 
+
+
 const routerConfig: ExtraOptions = {
     preloadingStrategy       : PreloadAllModules,
     scrollPositionRestoration: 'enabled'
@@ -39,7 +41,7 @@ const routerConfig: ExtraOptions = {
         // Layout module of your application
         LayoutModule,
 
-        CommonModule
+        CommonModule,
 
     ],
     bootstrap   : [

@@ -1,0 +1,55 @@
+<!-- <div class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+    <div class="text-lg font-medium tracking-tight leading-6 truncate">Budget Details</div>
+    <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
+
+    </div>
+</div> -->
+
+
+
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Main -->
+    <div class="flex-auto p-6 sm:p-10">
+        <!-- CONTENT GOES HERE -->
+        <div class="mt-4  h-150 min-h-50 max-h-300 border-2 rounded-2xl">
+            <ejs-grid #grid id="grid" class="border-2 rounded-2xl" [dataSource]="data" height="400"
+                [allowFiltering]="true" [allowGrouping]='true' [filterSettings]="filterSettings"
+                [toolbar]='toolbarOptions' [allowPaging]="true"  (commandClick)="commandClick($event)"
+                [pageSettings]="PageSettings" allowPaging='true' allowGrouping='true' allowSorting='true'
+                showColumnMenu='true' (toolbarClick)='approveAllRequests($event)'>
+                <e-columns>
+                    <e-column field="fullName" headerText="Collaborator" width="120" textAlign="center"
+                        isPrimaryKey="true" [validationRules]="orderidrules">
+                    </e-column>
+                    <e-column field="email" headerText="Email" width="140" format="yMd" textAlign="left"
+                        isPrimaryKey="true"></e-column>
+                    <e-column field="sopraID" headerText="Sopra ID" width="100"
+                        [validationRules]="customeridrules" isPrimaryKey="true">
+                    </e-column>
+                    <e-column field="isAlternate" headerText="Is Alternate" width="100"
+                        [validationRules]="customeridrules" isPrimaryKey="true">
+                    </e-column>
+                    <e-column field="hiringDate" headerText="Hiring Date" width="100"
+                        [validationRules]="customeridrules" isPrimaryKey="true">
+                    </e-column>
+                    <e-column field="phoneNumber" headerText="Phone Number" width="100"
+                        [validationRules]="customeridrules" isPrimaryKey="true">
+                    </e-column>
+                    <e-column headerText='Action' width=70 [commands]='commands'></e-column>
+                </e-columns>
+                <ng-template #emptyRecordTemplate>
+                    <div class='emptyRecordTemplate'>
+                        <img class="h-10" [src]="imageSrc()" class="e-emptyRecord" alt="No record">
+                        <span>There is no data available to display at the moment.</span>
+                    </div>
+                </ng-template>
+            </ejs-grid>
+        </div>
+    </div>
+</div>
+<!-- <div class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+    <div class="text-lg font-medium tracking-tight leading-6 truncate">Budget Details</div>
+    <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
+
+    </div>
+</div> -->

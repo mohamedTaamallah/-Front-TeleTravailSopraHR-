@@ -6,6 +6,7 @@ import { RemoteWorkRequest } from 'app/core/entities/RemoteWorkRequest';
 import { RemoteWorkRequestStatus } from 'app/core/entities/RemoteWorkRequestStatus';
 import { UpdateRemoteWorkRequest } from 'app/core/entities/requests/updateRemoteWorkRequest';
 import { Team } from 'app/core/entities/Team';
+import { User } from 'app/core/entities/User';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -13,6 +14,8 @@ import { Observable } from 'rxjs';
 })
 export class ManagerService {
     private _teamUrlApi: string = environment.TeamApiUrl;
+    private _userUrlApi: string = environment.UserApiUrl;
+
     private _remoteWorkRequestApiUrl: string =
         environment.RemoteWorkRequestApiUrl;
 
@@ -77,6 +80,30 @@ export class ManagerService {
     ): Observable<BlockedDay> {
         return this._httpClient.delete<BlockedDay>(
             `${this._teamUrlApi}/removeBlockedDayFromTeam/${teamID}/${blockedDayID}`
+        );
+    }
+
+    //getting all the team memebers
+    getTeamMembersByManager(idUser: number): Observable<User[]> {
+        return this._httpClient.get<User[]>(
+            `${this._teamUrlApi}/getTeamMemeberByManagers/${idUser}`
+        );
+    }
+
+    //Removing a team member from the team
+    removeCollaboratorFromTeam(
+        idTeam: number,
+        idUser: number
+    ): Observable<any> {
+        return this._httpClient.delete(
+            `${this._teamUrlApi}/removeCollaboratorFromTeam/${idTeam}/${idUser}`
+        );
+    }
+
+    //getting all the available collaborators to add for the team
+    getAllAvailableCollaborators(): Observable<User[]> {
+        return this._httpClient.get<User[]>(
+            `${this._userUrlApi}/getAllAvailableCollaborators`
         );
     }
 }

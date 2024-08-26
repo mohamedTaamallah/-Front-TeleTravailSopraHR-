@@ -85,8 +85,8 @@ export class RemoteWorkRequestListComponent implements OnInit {
             // Retrieve the updated row data
             const updatedRow = args.data as RemoteWorkRequest;
 
-            //updating the current element form the drop down to the table 
-            this.updateCurrentElementTable(updatedRow)
+            //updating the current element form the drop down to the table
+            this.updateCurrentElementTable(updatedRow);
 
             this.approveARemoteWorkRequest(
                 updatedRow.idRemoteWorkRequest,
@@ -105,7 +105,7 @@ export class RemoteWorkRequestListComponent implements OnInit {
         }
     }
 
-    //confirmation for accepting all the remote work Requests 
+    //confirmation for accepting all the remote work Requests
     openAddDialog(): void {
         const dialogRef2 = this._fuseConfirmationService.open(
             this._fuseConfirmationService._approveConfig
@@ -121,8 +121,8 @@ export class RemoteWorkRequestListComponent implements OnInit {
         });
     }
 
-    //Updating a local element in the table 
-    updateCurrentElementTable(updatedRow : any) {
+    //Updating a local element in the table
+    updateCurrentElementTable(updatedRow: any) {
         // Access the dropdown value from the updated row data
         updatedRow.requestStatus = this.updatedStatus;
 
@@ -218,5 +218,16 @@ export class RemoteWorkRequestListComponent implements OnInit {
                     console.log('Update request completed');
                 },
             });
+    }
+
+    public imageSrc(): string {
+        if (
+            document.body.classList.value.indexOf('dark') > -1 ||
+            document.body.classList.value.indexOf('highcontrast') > -1
+        ) {
+            return 'assets/images/logo/emptyRecordTemplate_light.svg';
+        } else {
+            return 'assets/images/logo/emptyRecordTemplate_light.svg';
+        }
     }
 }

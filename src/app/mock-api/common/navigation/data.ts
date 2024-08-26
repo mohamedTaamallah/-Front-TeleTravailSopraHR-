@@ -73,5 +73,12 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:newspaper',
         link : '/BlockedkDays'
+    },
+    {
+        id   : 'TeamMembers',
+        title: 'Team Members ',
+        type : 'basic',
+        icon : 'heroicons_outline:newspaper',
+        link : '/TeamMembers'
     }
 ];

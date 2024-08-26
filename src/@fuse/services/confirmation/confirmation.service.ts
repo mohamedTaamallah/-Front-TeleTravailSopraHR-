@@ -7,6 +7,7 @@ import { EditTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/ed
 import { Team } from 'app/core/entities/Team';
 import { User } from 'app/core/entities/User';
 import { AddTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/addTeam/add-team/add-team.component';
+import { AddColaboratorComponent } from 'app/modules/manager/team managment/addCollaborator/AddColaborator/AddColaborator.component';
 
 @Injectable()
 export class FuseConfirmationService
@@ -59,6 +60,33 @@ export class FuseConfirmationService
         dismissible: false
     };
 
+
+    /**
+     * Confirmation dialog of removing a collaborator from the team
+     */
+
+    public _removeCollaboratorConfig: FuseConfirmationConfig = {
+        title      : 'Approve all Requests',
+        message    : 'Are you sure you to remove collaborator from the team ?',
+        icon       : {
+            show : true,
+            name : 'heroicons_outline:exclamation',
+            color: 'warn'
+        },
+        actions    : {
+            confirm: {
+                show : true,
+                label: 'Confirm',
+                color: 'warn'
+            },
+            cancel : {
+                show : true,
+                label: 'Cancel'
+            }
+        },
+        dismissible: false
+    };
+
     /**
      * Edit Team dialog config
      */
@@ -78,6 +106,26 @@ export class FuseConfirmationService
         },
         dismissible: false
     };
+
+
+    /**
+     * Add Collaborator to team 
+     */
+    private _addCollaboratorToTeamConfig: FuseConfirmationConfig = {
+
+    actions    : {
+        confirm: {
+            show : true,
+            label: 'Confirm',
+            color: 'primary'
+        },
+        cancel : {
+            show : true,
+            label: 'Cancel'
+        }
+    },
+    dismissible: false
+};
 
     /**
      * Constructor
@@ -127,6 +175,20 @@ export class FuseConfirmationService
 
         // Open the dialog
         return this._matDialog.open(AddTeamComponent, {
+            autoFocus   : false,
+            disableClose: !userConfig.dismissible,
+            data        : userConfig,
+            panelClass  : 'fuse-confirmation-dialog-panel'
+        });
+    }
+
+    openAddCollaboratorToTeam(data:{ collaborators: User[]}): MatDialogRef<AddColaboratorComponent>
+    {
+        // Merge the user config with the default config
+        const userConfig = merge({}, this._addCollaboratorToTeamConfig,data);
+
+        // Open the dialog
+        return this._matDialog.open(AddColaboratorComponent, {
             autoFocus   : false,
             disableClose: !userConfig.dismissible,
             data        : userConfig,
