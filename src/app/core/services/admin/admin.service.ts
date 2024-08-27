@@ -8,51 +8,70 @@ import { Team } from 'app/core/entities/Team';
 import { AffectRoleStatusRequest } from 'app/core/entities/requests/AffectRoleStatusRequest';
 import { AllTeamsCountRequest } from 'app/core/entities/responses/AllTeamsCountRequest ';
 
-
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class AdminService {
+    constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
+    private UserApiUrl: string = environment.UserApiUrl;
+    private TeamApiUrl: string = environment.TeamApiUrl;
+    private authApiUrl: string = environment.AuthApiUrl;
 
-  private UserApiUrl: string = environment.UserApiUrl;
-  private TeamApiUrl: string = environment.TeamApiUrl;
+    //Getting all the users
+    getPendingUsersRequests(): Observable<UserWithTeamDTO[]> {
+        return this.http.get<UserWithTeamDTO[]>(
+            `${this.UserApiUrl}/getPendingUsersRequests`
+        );
+    }
 
+    //Affect role and change status for users
+    affectRoleAndChangeStatus(
+        affectRoleAndChangeStatus: AffectRoleStatusRequest
+    ): Observable<User> {
+        return this.http.put<User>(
+            `${this.UserApiUrl}/affectRoleAndChangeStatus`,
+            affectRoleAndChangeStatus
+        );
+    }
 
-  //Getting all the users 
-  getPendingUsersRequests(): Observable<UserWithTeamDTO []> {
-    return this.http.get<UserWithTeamDTO []>(`${this.UserApiUrl}/getPendingUsersRequests`)
-  }
+    //Getting all the available teams
+    getAllTeams(): Observable<AllTeamsCountRequest[]> {
+        return this.http.get<AllTeamsCountRequest[]>(
+            `${this.TeamApiUrl}/getAllTeams`
+        );
+    }
 
-  //Affect role and change status for users 
-  affectRoleAndChangeStatus(affectRoleAndChangeStatus:  AffectRoleStatusRequest): Observable<User> {
-    return this.http.put<User>(`${this.UserApiUrl}/affectRoleAndChangeStatus`,affectRoleAndChangeStatus)
-  }
+    //Getting all the available managers that still ain't having a team
+    getAllManagers(): Observable<User[]> {
+        return this.http.get<User[]>(`${this.UserApiUrl}/getAllManagers`);
+    }
 
-  //Getting all the available teams 
-  getAllTeams(): Observable<AllTeamsCountRequest []> {
-    return this.http.get<AllTeamsCountRequest []>(`${this.TeamApiUrl}/getAllTeams`)
-  }
+    //Updating an existing team and affecting a manager
+    updateTeam(team: Team): Observable<Team> {
+        const idManager = team.manager.idUser;
+        return this.http.put<Team>(
+            `${this.TeamApiUrl}/updateTeam/${idManager}`,
+            team
+        );
+    }
 
-  //Getting all the available managers that still ain't having a team 
-  getAllManagers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.UserApiUrl}/getAllManagers`)
-  }
+    //Adding a new Team
+    createTeam(team: Team): Observable<Team> {
+        return this.http.post<Team>(`${this.TeamApiUrl}/createTeam`, team);
+    }
 
-  //Updating an existing team and affecting a manager
-  updateTeam(team: Team): Observable<Team> {
-    const idManager = team.manager.idUser;
-    return this.http.put<Team>(`${this.TeamApiUrl}/updateTeam/${idManager}`, team);
-  }
+    //Delete a  Team
+    deleteTeam(idTeam: number): Observable<Team> {
+        return this.http.delete<Team>(
+            `${this.TeamApiUrl}/deleteTeam/${idTeam}`
+        );
+    }
 
-   //Adding a new Team 
-  createTeam(team: Team): Observable<Team> {
-    return this.http.post<Team>(`${this.TeamApiUrl}/createTeam`, team);
-  }
-
-  //Delete a  Team 
-  deleteTeam(idTeam: number): Observable<Team> {
-    return this.http.delete<Team>(`${this.TeamApiUrl}/deleteTeam/${idTeam}`);
-  }
+    //Getting all the available teams
+    getAllTeamsSignUp(): Observable<AllTeamsCountRequest[]> {
+        return this.http.get<AllTeamsCountRequest[]>(
+            `${this.authApiUrl}/getAllTeams`
+        );
+    }
 }

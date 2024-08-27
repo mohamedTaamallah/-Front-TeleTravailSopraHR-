@@ -1,4 +1,3 @@
-import { Team } from "app/core/entities/Team";
 
 export interface FuseConfirmationConfig
 {

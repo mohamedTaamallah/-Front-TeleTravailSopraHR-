@@ -121,7 +121,7 @@ export class TeamHandleComponent {
     openAddDialog(): void {
         let collaborators = this.Collaborators
         const dialogRef2 =
-            this._fuseConfirmationService.openAddCollaboratorToTeam({collaborators});
+            this._fuseConfirmationService.openAddCollaboratorToTeam(this.Collaborators);
 
         dialogRef2.afterClosed().subscribe((result) => {
             if (result) {

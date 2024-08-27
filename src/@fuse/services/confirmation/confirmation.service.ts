@@ -7,7 +7,7 @@ import { EditTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/ed
 import { Team } from 'app/core/entities/Team';
 import { User } from 'app/core/entities/User';
 import { AddTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/addTeam/add-team/add-team.component';
-import { AddColaboratorComponent } from 'app/modules/manager/team managment/addCollaborator/AddColaborator/AddColaborator.component';
+import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managment/addCollaborator/add-team/addCollaborator.component';
 
 @Injectable()
 export class FuseConfirmationService
@@ -182,13 +182,13 @@ export class FuseConfirmationService
         });
     }
 
-    openAddCollaboratorToTeam(data:{ collaborators: User[]}): MatDialogRef<AddColaboratorComponent>
+    openAddCollaboratorToTeam(data : User[]): MatDialogRef<AddCollaboratorToTeamComponent>
     {
         // Merge the user config with the default config
-        const userConfig = merge({}, this._addCollaboratorToTeamConfig,data);
+        const userConfig = merge({}, this._editTeamConfig,data);
 
         // Open the dialog
-        return this._matDialog.open(AddColaboratorComponent, {
+        return this._matDialog.open(AddCollaboratorToTeamComponent, {
             autoFocus   : false,
             disableClose: !userConfig.dismissible,
             data        : userConfig,

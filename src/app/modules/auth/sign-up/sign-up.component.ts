@@ -27,6 +27,9 @@ import { Role } from 'app/core/entities/Role';
 import { StudySchedule } from 'app/core/entities/StudySchedule';
 import { DateTime } from 'luxon';
 import { max } from 'lodash';
+import { AllTeamsCountRequest } from 'app/core/entities/responses/AllTeamsCountRequest ';
+import { AdminService } from 'app/core/services/admin/admin.service';
+import { Team } from 'app/core/entities/Team';
 
 @Component({
     selector: 'auth-sign-up',
@@ -35,7 +38,7 @@ import { max } from 'lodash';
     animations: fuseAnimations,
 })
 export class AuthSignUpComponent implements OnInit {
-    [x: string]: any;
+
     @ViewChild('signUpNgForm') signUpNgForm: NgForm;
 
     alert: { type: FuseAlertType; message: string } = {
@@ -47,7 +50,7 @@ export class AuthSignUpComponent implements OnInit {
     // Define task and initialize it with an empty object
     task: any = {};
     confirmPassword: string;
-    userRoleValues = ['MANAGER', 'COLLABORATOR', 'COLLABORATOR (Student)'];
+    userRoleValues = ['COLLABORATOR', 'COLLABORATOR (Student)'];
     daysOfWeek = [
         { value: 1, viewValue: 'Monday' },
         { value: 2, viewValue: 'Tuesday' },
@@ -62,6 +65,7 @@ export class AuthSignUpComponent implements OnInit {
     minDate: any
     maxDate: any
 
+    public teams : Team[] 
 
     /**
      * Constructor
@@ -70,8 +74,8 @@ export class AuthSignUpComponent implements OnInit {
         private _authService: AuthService,
         private _formBuilder: UntypedFormBuilder,
         private _router: Router,
-        private _jwtService: JwtTokenService,
-        private cdr: ChangeDetectorRef // Inject ChangeDetectorRef
+        private cdr: ChangeDetectorRef, // Inject ChangeDetectorRef,
+        private _adminService : AdminService
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -82,6 +86,8 @@ export class AuthSignUpComponent implements OnInit {
      * On init
      */
     ngOnInit(): void {
+
+        this.getAllTeams()
 
         this.calculateDateRange()
         
@@ -114,7 +120,7 @@ export class AuthSignUpComponent implements OnInit {
                     '',
                     [Validators.required, Validators.email],
                 ],
-                gender: ['', Validators.required],
+                team: ['', Validators.required],
             }),
             step2: this._formBuilder.group({
                 password: [
@@ -212,6 +218,7 @@ export class AuthSignUpComponent implements OnInit {
         );
     }
 
+
     // -----------------------------------------------------------------------------------------------------
     // @ Utils methods
     // -----------------------------------------------------------------------------------------------------
@@ -237,12 +244,19 @@ export class AuthSignUpComponent implements OnInit {
             step3Values.daysOfStudy
         );
 
+        this.user.userTeam = new Team(step1Values.team)
+
+
         if (step2Values.role == 'COLLABORATOR (Student)') {
             this.user.role = Role.COLLABORATOR;
             this.user.isAlternate = true;
         } else {
             this.user.isAlternate = false;
         }
+        console.log(this.user)
+        console.log(step1Values)
+
+
     }
 
     // Method to check if a field  exists already in the data base
@@ -281,6 +295,23 @@ export class AuthSignUpComponent implements OnInit {
         // Get today's date
         this.maxDate = DateTime.now().toJSDate();
  
+    }
+
+    
+    // -----------------------------------------------------------------------------------------------------
+    // @ Utils methods
+    // -----------------------------------------------------------------------------------------------------
+
+    getAllTeams(): void {
+        this._adminService.getAllTeamsSignUp().subscribe({
+            next: (data: AllTeamsCountRequest[]) => {
+                this.teams = data.map(request => request.team); // Extract the team property
+                console.log(this.teams); // Verify that the teams are extracted correctl
+            },
+            error: (error) => {
+                console.error('Error fetching teams:', error);
+            },
+        });
     }
 
 

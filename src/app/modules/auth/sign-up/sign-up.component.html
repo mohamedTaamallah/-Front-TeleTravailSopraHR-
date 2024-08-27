@@ -109,29 +109,26 @@
 
                         </mat-form-field>
                 </div>
-                     <!-- sexe -->
+                     <!-- Team -->
                    <div class="flex"> 
                     <mat-form-field class="flex-auto gt-xs:pr-3">
                         <mat-select
-                            [formControlName]="'gender'"
-                            [placeholder]="'Choose your gender'"
+                            formControlName="team"
+                            placeholder="Choose your Team"
                             required
                         >
-                            <mat-option value="Male"
-                                >Male</mat-option
-                            >
-                            <mat-option value="Female"
-                                >Female</mat-option
-                            >
+                            <mat-option *ngFor="let team of teams" [value]="team.idTeam">
+                                {{ team.teamName }}
+                            </mat-option>
                         </mat-select>
                         <mat-icon
                             class="icon-size-5"
                             matPrefix
-                            [svgIcon]="
-                                'heroicons_outline:chevron-double-right'
-                            "
+                            [svgIcon]="'heroicons_outline:chevron-double-right'"
                         ></mat-icon>
-                        <mat-error *ngIf="signUpForm.get('step1.gender').hasError('required')">Please choose your gender</mat-error>
+                        <mat-error *ngIf="signUpForm.get('step1.team').hasError('required')">
+                            Please choose your Team
+                        </mat-error>
                     </mat-form-field>
                    </div>
                    

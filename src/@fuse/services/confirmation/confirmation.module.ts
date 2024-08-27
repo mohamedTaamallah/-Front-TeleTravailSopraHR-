@@ -12,15 +12,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AddTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/addTeam/add-team/add-team.component';
-import { AutoCompleteModule } from '@syncfusion/ej2-angular-dropdowns';
-import { AddColaboratorComponent } from 'app/modules/manager/team managment/addCollaborator/AddColaborator/AddColaborator.component';
+import { AutoCompleteModule, DropDownList, DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managment/addCollaborator/add-team/addCollaborator.component';
 
 @NgModule({
     declarations: [
         FuseConfirmationDialogComponent,
         EditTeamComponent,
         AddTeamComponent,
-        AddColaboratorComponent
+        AddCollaboratorToTeamComponent
     ],
     imports     : [
         MatButtonModule,
@@ -33,7 +33,8 @@ import { AddColaboratorComponent } from 'app/modules/manager/team managment/addC
         MatInputModule,
         MatSelectModule,
         ReactiveFormsModule ,
-        AutoCompleteModule
+        AutoCompleteModule,
+        DropDownListModule
     ],
     providers   : [
         FuseConfirmationService

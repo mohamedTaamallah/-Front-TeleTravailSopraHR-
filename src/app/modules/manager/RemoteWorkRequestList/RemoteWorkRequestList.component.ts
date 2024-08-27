@@ -37,7 +37,7 @@ export class RemoteWorkRequestListComponent implements OnInit {
     public statusOptions: Object[] = [
         { text: 'Pending', value: 'PENDING' },
         { text: 'Approved', value: 'APPROVED' },
-        { text: 'Rejected', value: 'REJECTED' },
+        { text: 'Refused', value: 'REFUSED' },
     ];
 
     public orderData: any = [];
