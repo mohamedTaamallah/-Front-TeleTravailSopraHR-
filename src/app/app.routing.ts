@@ -110,5 +110,11 @@ export const appRoutes: Route[] = [
             {path: 'TeamMembers', loadChildren: () => import('app/modules/manager/team managment/teamMemberTable/TeamHandle.module').then(m => m.TeamHandleModule)},
 
         ]
-    }
+    },                
+    // Error
+    {path: 'error', children: [
+        {path: '404', loadChildren: () => import('app/modules/error/error-404/error-404.module').then(m => m.Error404Module)},
+        {path: '500', loadChildren: () => import('app/modules/error/error-500/error-500.module').then(m => m.Error500Module)}
+    ]},
+   
 ];

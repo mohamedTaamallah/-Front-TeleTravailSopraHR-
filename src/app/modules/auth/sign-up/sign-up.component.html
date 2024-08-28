@@ -109,28 +109,6 @@
 
                         </mat-form-field>
                 </div>
-                     <!-- Team -->
-                   <div class="flex"> 
-                    <mat-form-field class="flex-auto gt-xs:pr-3">
-                        <mat-select
-                            formControlName="team"
-                            placeholder="Choose your Team"
-                            required
-                        >
-                            <mat-option *ngFor="let team of teams" [value]="team.idTeam">
-                                {{ team.teamName }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-icon
-                            class="icon-size-5"
-                            matPrefix
-                            [svgIcon]="'heroicons_outline:chevron-double-right'"
-                        ></mat-icon>
-                        <mat-error *ngIf="signUpForm.get('step1.team').hasError('required')">
-                            Please choose your Team
-                        </mat-error>
-                    </mat-form-field>
-                   </div>
                    
                       <!-- button next -->
                     <div class="flex justify-end">
@@ -186,6 +164,7 @@
                             </mat-form-field>
                     </div>
 
+                     <!-- Role -->
                     <mat-form-field class="flex">
                         <mat-select
                             [formControlName]="'role'"
@@ -201,7 +180,33 @@
                             matPrefix
                             [svgIcon]="'heroicons_outline:tag'"
                         ></mat-icon>
-                    </mat-form-field>
+                    </mat-form-field>                    
+                     <!-- Team -->
+                    <div class="flex"> 
+                     <mat-form-field class="flex-auto gt-xs:pr-3">
+                         <mat-select
+                             formControlName="team"
+                             placeholder="Choose your Team"
+                             required
+                         >
+                             <mat-option *ngFor="let team of teams" [value]="team.idTeam">
+                                 {{ team.teamName }}
+                             </mat-option>
+                         </mat-select>
+                         <mat-icon
+                             class="icon-size-5"
+                             matPrefix
+                             [svgIcon]="'heroicons_outline:chevron-double-right'"
+                         ></mat-icon>
+                         <mat-error *ngIf="signUpForm.get('step2.team').hasError('required')">
+                             Please choose your Team
+                         </mat-error>
+                     </mat-form-field>
+                    </div>
+
+
+
+                    
                     
                      <!-- hiringDate -->
                     <div class="font-medium">Hiring Date</div>
@@ -273,8 +278,9 @@
                                     </button>
                                 </mat-datepicker-actions>
                             </mat-datepicker>
-                        </mat-form-field>
-                    </div>
+                        </mat-form-field>                     
+                    </div>                       
+
                     
                     <div class="flex justify-end mt-8">
                         <button

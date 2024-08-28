@@ -53,7 +53,6 @@ export class collaboratorSchedulerComponent implements OnInit {
     public remoteWorkRequests: RemoteWorkRequest[];
     public maxApprovedRequestsPerDay: number;
     public maxApprovedRequestsPerMonth: number;
-    private isSavingNewRequest: boolean = false; // Flag to check first save
 
     constructor(
         private collaboratorService: CollaboratorService,
@@ -62,7 +61,6 @@ export class collaboratorSchedulerComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        
         this.user = this.sessionService.getUser();
         this.maxApprovedRequestsPerDay = this.user.userTeam.onsiteEmployees;
         this.maxApprovedRequestsPerMonth = this.user.remoteWorkBalance;
@@ -92,7 +90,6 @@ export class collaboratorSchedulerComponent implements OnInit {
             this.handleUpdateEvent(eventData);
         }
         if (args.requestType === 'eventCreate') {
-            this.isSavingNewRequest = true; // Set the flag to true for the first save
             const eventData = args.data;
             this.handleSaveEvent(eventData);
         }
@@ -104,7 +101,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         const requestDate = event.StartTime;
         const status = event.Status;
 
-        if(args ){
+        if (args) {
             this.presetTitleAndDescription(args);
         }
         // If the target is the scheduler cell (date), apply the logic in the else block
@@ -164,14 +161,15 @@ export class collaboratorSchedulerComponent implements OnInit {
                 );
                 return;
             }
-            if (this.hasExceededPendingRequestsForMonth(requestDate)) {
-                // Step 2: Validate request based on weekly pending limits
-                this._fuseUtilsService.cancelPopup(
-                    args,
-                    'Remote work requests can only be added for the current month.'
-                );
-                return;
-            }
+
+            // if (this.hasExceededPendingRequestsForMonth(requestDate)) {
+            //     // Step 2: Validate request based on weekly pending limits
+            //     this._fuseUtilsService.cancelPopup(
+            //         args,
+            //         'Remote work requests can only be added for the current month.'
+            //     );
+            //     return;
+            // }
         } else {
             // Step 1: Validate against blocked days or existing remote work requests
             this.checkEventSettings(args, status);
@@ -207,7 +205,9 @@ export class collaboratorSchedulerComponent implements OnInit {
             requestStatus: RemoteWorkRequestStatus.PENDING,
         };
 
-        this.addRequest(remoteWorkRequest);
+        //we letting the validation determine the add or not 
+        this.validateRemoteRequest(remoteWorkRequest)
+        //this.addRequest(remoteWorkRequest);
     }
 
     // Verify if the current date has an already remote request for the same user
@@ -220,7 +220,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     }
 
     isStudyDayCheck(date: Date): boolean {
-        const dayOfWeek = date.getDay(); // Get the day of the week (0 = Sunday, 6 = Saturday)
+        const dayOfWeek = date.getDay()+1; // Get the day of the week (0 = Sunday, 6 = Saturday)
         const weekOfMonth = Math.ceil(date.getDate() / 7); // Get the week number within the month
         // Exclude August (7 = August since months are 0-indexed)
         if (date.getMonth() === 7) {
@@ -244,18 +244,15 @@ export class collaboratorSchedulerComponent implements OnInit {
     }
     // Blocks the title and the description for the add
     presetTitleAndDescription(args: PopupOpenEventArgs) {
-      
         const titleElement = args.element.querySelector(
             '.e-subject'
         ) as HTMLInputElement;
-        if(titleElement){
+        if (titleElement) {
             titleElement.value = `${this.user.fullName} [Remote Work]`;
             titleElement.setAttribute('readonly', 'true');
         }
-    
 
         if (args.type === 'Editor') {
-
             // Lock the end time
             const endTimeElement = args.element.querySelector(
                 '.e-end'
@@ -294,15 +291,12 @@ export class collaboratorSchedulerComponent implements OnInit {
         if (allDayElement) allDayElement.style.display = 'none';
     }
 
-
-
     // Merge the blocked days and remote requests into event settings
-
 
     // Prevents the edit for the approved, refused and blocked days
     checkEventSettings(args: Record<string, any>, status: any) {
         const eventData = args.data;
-        
+
         const quickPopup: HTMLElement = args.element.querySelector(
             '.e-quick-popup-wrapper .e-event-popup'
         );
@@ -317,8 +311,7 @@ export class collaboratorSchedulerComponent implements OnInit {
             );
             editButton.remove();
             deleteButton.remove();
-        }
-        else{
+        } else {
             editButton.remove();
         }
     }
@@ -326,24 +319,23 @@ export class collaboratorSchedulerComponent implements OnInit {
     // Render the cells in order to change the colors depending on the type of event
     onEventRendered(args: EventRenderedArgs): void {
         const dateCell = new Date(args.data.StartTime).setHours(0, 0, 0, 0);
-    
 
-    
         // Check if the cell date is a blocked day
         if (
             this.blockedDays.some(
-                (day) => new Date(day.blockedDate).setHours(0, 0, 0, 0) === dateCell
+                (day) =>
+                    new Date(day.blockedDate).setHours(0, 0, 0, 0) === dateCell
             )
         ) {
             args.element.style.backgroundColor = '#06b6d4';
         }
-    
+
         const request = this.remoteWorkRequests.find(
             (request) =>
-                new Date(request.requestDate).setHours(0, 0, 0, 0) === dateCell &&
-                Number(request.user.idUser) === this.user.idUser
+                new Date(request.requestDate).setHours(0, 0, 0, 0) ===
+                    dateCell && Number(request.user.idUser) === this.user.idUser
         );
-    
+
         if (request) {
             switch (request.requestStatus) {
                 case RemoteWorkRequestStatus.REFUSED:
@@ -377,8 +369,13 @@ export class collaboratorSchedulerComponent implements OnInit {
             next: ({ blockedDays, remoteWorkRequests }) => {
                 this.blockedDays = blockedDays;
                 this.remoteWorkRequests = remoteWorkRequests;
-                this.eventSettings =this._fuseUtilsService.updateEventSettings(this.blockedDays,this.remoteWorkRequests,this.user,this.eventSettings);
-                console.log(this.eventSettings)
+                this.eventSettings = this._fuseUtilsService.updateEventSettings(
+                    this.blockedDays,
+                    this.remoteWorkRequests,
+                    this.user,
+                    this.eventSettings
+                );
+                console.log(this.eventSettings);
             },
             error: (error: any) => {
                 console.error('Error fetching data:', error);
@@ -452,6 +449,30 @@ export class collaboratorSchedulerComponent implements OnInit {
             });
     }
 
+    // Handles the add remote work request
+    validateRemoteRequest(remoteWorkRequest: RemoteWorkRequest): void {
+        remoteWorkRequest.user = this.user
+        this.collaboratorService
+            .validateRemoteWorkRequest(remoteWorkRequest)
+            .subscribe({
+                next: (response: any) => {
+                    // Handle successful response
+                    console.log(
+                        'Remote Work Request Validation',
+                        response
+                    );
+                    if(response.success == false){
+                        alert(response.message)
+                    }
+                    this.onFetchData();
+                },
+                error: (error: any) => {
+                    // Handle error response
+                    console.error('Error adding remote work request:', error);
+                },
+            });
+    }
+
     // -----------------------------------------------------------------------------------------------------
     // @ Condition verification methods
     // -----------------------------------------------------------------------------------------------------
@@ -497,7 +518,12 @@ export class collaboratorSchedulerComponent implements OnInit {
             (request) =>
                 request.idRemoteWorkRequest !== Number(remoteWorkRequestId)
         );
-       this._fuseUtilsService.updateEventSettings(this.blockedDays,this.remoteWorkRequests,this.user, this.eventSettings );
+        this._fuseUtilsService.updateEventSettings(
+            this.blockedDays,
+            this.remoteWorkRequests,
+            this.user,
+            this.eventSettings
+        );
     }
 
     // Helper method to check if the user has exceeded pending requests in the current week
@@ -525,13 +551,14 @@ export class collaboratorSchedulerComponent implements OnInit {
         return currentMonth !== eventMonth || currentYear !== eventYear;
     }
 
-    //checks if there is one pending request for a week with study days 
+    //checks if there is one pending request for a week with study days
     canAddRemoteWorkRequestForWeek(date: Date): boolean {
         const weekStart = this._fuseUtilsService.getStartOfWeek(date);
         const weekEnd = this._fuseUtilsService.getEndOfWeek(date);
 
-        if(date.getMonth()===7){//no study days should be visible for August
-            return true 
+        if (date.getMonth() === 7) {
+            //no study days should be visible for August
+            return true;
         }
         // Filter approved remote work requests for the same user in the given week
         const approvedRequestsInWeek = this.remoteWorkRequests.filter(
@@ -547,6 +574,6 @@ export class collaboratorSchedulerComponent implements OnInit {
         );
 
         // Return true if the number of approved requests is less than the maximum allowed
-        return approvedRequestsInWeek.length < 1;
+        return approvedRequestsInWeek.length < 2;
     }
 }

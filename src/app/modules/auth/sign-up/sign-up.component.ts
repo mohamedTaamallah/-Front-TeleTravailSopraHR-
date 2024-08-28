@@ -119,8 +119,7 @@ export class AuthSignUpComponent implements OnInit {
                 email: [
                     '',
                     [Validators.required, Validators.email],
-                ],
-                team: ['', Validators.required],
+                ]
             }),
             step2: this._formBuilder.group({
                 password: [
@@ -129,6 +128,8 @@ export class AuthSignUpComponent implements OnInit {
                 ],
                 role: ['', Validators.required],
                 hiringDate: ['', Validators.required],
+                team: ['', Validators.required],
+
             }),
             step3: this._formBuilder.group({
                 isTwoFirstWeek: [null, Validators.required],
@@ -244,7 +245,7 @@ export class AuthSignUpComponent implements OnInit {
             step3Values.daysOfStudy
         );
 
-        this.user.userTeam = new Team(step1Values.team)
+        this.user.userTeam = new Team(step2Values.team)
 
 
         if (step2Values.role == 'COLLABORATOR (Student)') {

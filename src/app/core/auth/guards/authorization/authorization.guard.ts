@@ -27,7 +27,7 @@ export class AuthorizationGuard implements CanActivate {
         if (user && user.role === expectedRole) {
             return true;
         } else {
-            this.router.navigate(['/sign-in']);
+            this.router.navigate(['/error/500']);
             return false;
         }
     }

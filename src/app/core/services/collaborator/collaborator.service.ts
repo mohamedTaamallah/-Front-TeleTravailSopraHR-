@@ -50,4 +50,10 @@ export class CollaboratorService {
             {}
         );
     }
+
+     //Adding a new Remote Rquest 
+    validateRemoteWorkRequest(remoteWorkRequest : RemoteWorkRequest): Observable<RemoteWorkRequest> {
+        return this._httpClient.post<RemoteWorkRequest>(`${this._remoteWorkRequestApiUrl}/validateRemoteWorkRequest`, remoteWorkRequest);
+    }
+
 }
