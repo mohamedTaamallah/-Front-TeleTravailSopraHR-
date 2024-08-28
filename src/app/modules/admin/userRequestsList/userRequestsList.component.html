@@ -72,9 +72,18 @@
                         headerText="Team"
                         width="150"
                         editType="dropdownedit"
-                        isPrimaryKey="true"
-
-                    ></e-column>
+                    >
+                    <ng-template #editTemplate>
+                        <ejs-dropdownlist
+                          id="team.teamName"
+                          name="Team"
+                          [(value)]="teamName"
+                          [dataSource]="teams"
+                          [fields]="{ text: 'teamName', value: 'teamName' }"
+                          >
+                        </ejs-dropdownlist>
+                      </ng-template>
+                </e-column>
                     <e-column
                         field="user.userStatus"
                         headerText="Status"

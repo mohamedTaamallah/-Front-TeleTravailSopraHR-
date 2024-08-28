@@ -4,6 +4,7 @@ import {  userRequestsListComponent } from 'app/modules/admin/userRequestsList/u
 // import the GridModule for the Grid component
 import { GridModule, Filter, Sort, FilterService, ToolbarService, PageService,PrintEventArgs, EditService, ForeignKeyService } from '@syncfusion/ej2-angular-grids';
 import { CommonModule } from '@angular/common';
+import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 
 const exampleRoutes: Route[] = [
     {
@@ -20,6 +21,8 @@ const exampleRoutes: Route[] = [
         RouterModule.forChild(exampleRoutes),
         GridModule,
         CommonModule,
+        DropDownListModule
+
 
     ],
     providers: [
