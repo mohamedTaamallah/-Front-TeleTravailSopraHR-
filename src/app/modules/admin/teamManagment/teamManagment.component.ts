@@ -262,6 +262,8 @@ export class teamManagmentComponent {
             },
         });
     }
+
+    
     onAddTeam(team: Team): void {
         this._adminService.createTeam(team).subscribe({
             next: (newTeam) => {

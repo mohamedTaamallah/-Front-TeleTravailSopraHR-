@@ -49,26 +49,36 @@ export class AddCollaboratorToTeamComponent {
     }
 
     onSubmit(): void {
-
+        if (this.selectedCollaborator != null) {
+            console.log("")
+            this.dialogRef.close({
+                status: 'confirmed',
+                selectedCollaborator :this.selectedCollaborator
+            });
+        } else {
+            console.log('the selected Collaborator is empty');
+        }
     }
 
-    hasChanges(newTeam: any): any {
- 
-    }
 
  
     onFiltering(e: any): void {
-       console.log(e)
     }
+
     onCancel(): void {
         this.dialogRef.close({
             status: 'cancelled',
         });
     }
+    
     onSelectionChange(event: any): void {
         this.selectedCollaborator = event.itemData;
         console.log('Selected Collaborator:', this.selectedCollaborator);
     }
+
+
+
+    
  
 
 }

@@ -29,7 +29,7 @@ export class TeamHandleComponent {
     public PageSettings: Object;
     public editSettings?: EditSettingsModel;
     public commands?: CommandModel[];
-    public Collaborators ?: User[];
+    public Collaborators?: User[];
 
     /**
      * Constructor
@@ -53,7 +53,7 @@ export class TeamHandleComponent {
         this.filterSettings = { type: 'CheckBox' };
 
         this.getTeamMembersByManager();
-        this.getAllAvailableCollaborators()
+        this.getAllAvailableCollaborators();
 
         this.commands = [
             {
@@ -119,18 +119,28 @@ export class TeamHandleComponent {
     }
 
     openAddDialog(): void {
-        let collaborators = this.Collaborators
         const dialogRef2 =
-            this._fuseConfirmationService.openAddCollaboratorToTeam(this.Collaborators);
+            this._fuseConfirmationService.openAddCollaboratorToTeam(
+                this.Collaborators
+            );
+        dialogRef2
+            .afterClosed()
+            .subscribe(
+                (result: { status: string; selectedCollaborator: any }) => {
+                    if (result) {
+                        console.log('$$$$$$$$$$$' + result.status);
 
-        dialogRef2.afterClosed().subscribe((result) => {
-            if (result) {
-                if (result.status === 'confirmed' && result.updatedTeam) {
-                } else if (result.status === 'cancelled') {
-                    console.log('Operation cancelled');
+                        if (result.status === 'confirmed') {
+                            console.log('$$$$$$$$$$$' + result);
+                            this.onAddNewCollaborator(
+                                result.selectedCollaborator.idUser
+                            );
+                        } else if (result.status === 'cancelled') {
+                            console.log('Operation cancelled');
+                        }
+                    }
                 }
-            }
-        });
+            );
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -145,6 +155,7 @@ export class TeamHandleComponent {
                 next: (response) => {
                     console.log('all the team memebers are :', response);
                     this.data = response;
+                    this.getAllAvailableCollaborators()
                 },
                 error: (error) => {
                     console.error('Error getting all the team members:', error);
@@ -167,26 +178,58 @@ export class TeamHandleComponent {
                     this.data = this.data.filter(
                         (user) => user.idUser !== idUser
                     );
+                    this.getAllAvailableCollaborators()
                 },
                 error: (error) => {
                     console.error('Error removing collaborator:', error);
                 },
             });
     }
-    getAllAvailableCollaborators() {
+
+    getAllAvailableCollaborators() : any{
+        this._managerService.getAllAvailableCollaborators().subscribe({
+            next: (response) => {
+                console.log('all the available collaborators  are :', response);
+                this.Collaborators = response;
+                return response
+            },
+            error: (error) => {
+                console.error(
+                    'Error getting all available collaborators:',
+                    error
+                );
+            },
+            complete: () => {
+                // Optional: Code to execute when the Observable completes
+                console.log('Get all colloaborators is complete');
+            },
+        });
+    }
+
+    onAddNewCollaborator(userID: number) {
         this._managerService
-            .getAllAvailableCollaborators()
+            .addNewCollaboratorToTeam(this.user.managedTeam.idTeam, userID)
             .subscribe({
                 next: (response) => {
-                    console.log('all the available collaborators  are :', response);
-                    this.Collaborators = response;
+                    console.log('The new Collaborator is :', response);
+                    // Assuming 'response' contains the added collaborator details, push it to the 'data' array.
+                    this.data.push(response);
+
+                    // If your table or grid does not automatically refresh, you may need to manually trigger a refresh or reassign the data array.
+                    this.data = [...this.data]; // Trigger change detection if needed.
+                    this.getAllAvailableCollaborators()
+
                 },
                 error: (error) => {
-                    console.error('Error getting all available collaborators:', error);
+                    console.error(
+                        'Error getting adding a new collaborator:',
+                        error
+                    );
                 },
                 complete: () => {
                     // Optional: Code to execute when the Observable completes
-                    console.log('Get all colloaborators is complete');
+                    console.log('Adding a collaborator is complete');
                 },
             });
-    }}
+    }
+}

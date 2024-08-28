@@ -106,4 +106,15 @@ export class ManagerService {
             `${this._userUrlApi}/getAllAvailableCollaborators`
         );
     }
+
+    //Adding a new collaborator 
+    addNewCollaboratorToTeam(
+        teamID: number,
+        userID : number
+    ): Observable<User> {
+        return this._httpClient.post<User>(
+            `${this._teamUrlApi}/addCollaboratorToTeam/${teamID}/${userID}`,'');
+    }
+
+
 }
