@@ -20,7 +20,8 @@ import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managme
         FuseConfirmationDialogComponent,
         EditTeamComponent,
         AddTeamComponent,
-        AddCollaboratorToTeamComponent
+        AddCollaboratorToTeamComponent,
+        
     ],
     imports     : [
         MatButtonModule,
@@ -34,7 +35,8 @@ import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managme
         MatSelectModule,
         ReactiveFormsModule ,
         AutoCompleteModule,
-        DropDownListModule
+        DropDownListModule,
+
     ],
     providers   : [
         FuseConfirmationService

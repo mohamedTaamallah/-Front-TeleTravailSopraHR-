@@ -8,6 +8,7 @@ import { Team } from 'app/core/entities/Team';
 import { User } from 'app/core/entities/User';
 import { AddTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/addTeam/add-team/add-team.component';
 import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managment/addCollaborator/add-team/addCollaborator.component';
+import { SchedulerParamaetersComponent } from 'app/modules/collaborator/SchedulerParamaeters/SchedulerParamaeters.component';
 
 @Injectable()
 export class FuseConfirmationService
@@ -193,6 +194,20 @@ export class FuseConfirmationService
             disableClose: !userConfig.dismissible,
             data        : userConfig,
             panelClass  : 'fuse-confirmation-dialog-panel'
+        });
+    }
+
+    openSchedulerParameters(): MatDialogRef<SchedulerParamaetersComponent>
+    {
+        // Merge the user config with the default config
+        const userConfig = merge({}, this._editTeamConfig);
+
+        // Open the dialog
+        return this._matDialog.open(SchedulerParamaetersComponent, {
+            autoFocus   : false,
+            disableClose: !userConfig.dismissible,
+            data        : userConfig,
+            panelClass  : 'SchedulerParamaetersComponent'
         });
     }
 }
