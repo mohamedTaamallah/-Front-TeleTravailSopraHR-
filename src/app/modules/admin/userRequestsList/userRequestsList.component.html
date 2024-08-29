@@ -66,7 +66,8 @@
                         headerText="Requested Role"
                         width="150"
                         editType="dropdownedit"
-                    ></e-column>
+                    >
+                </e-column>
                     <e-column
                         field="team.teamName"
                         headerText="Team"
@@ -77,9 +78,11 @@
                         <ejs-dropdownlist
                           id="team.teamName"
                           name="Team"
-                          [(value)]="teamName"
+                          [(value)]="idTeam"
                           [dataSource]="teams"
-                          [fields]="{ text: 'teamName', value: 'teamName' }"
+                          [fields]="{ text: 'teamName', value: 'id' }"
+                          (change)="onTeamChange($event)"
+                          [enabled]="isTeamDropdownEnabled"
                           >
                         </ejs-dropdownlist>
                       </ng-template>

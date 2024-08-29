@@ -15,6 +15,9 @@ import { UserWithTeamDTO } from 'app/core/entities/responses/UserWithTeamDTO';
 import { Team } from 'app/core/entities/Team';
 import { AffectRoleStatusRequest } from 'app/core/entities/requests/AffectRoleStatusRequest';
 import { AllTeamsCountRequest } from 'app/core/entities/responses/AllTeamsCountRequest ';
+import { ManagerService } from 'app/core/services/manager/Manager.service';
+import { UserStatus } from 'app/core/entities/UserStatus';
+import { Role } from 'app/core/entities/Role';
 
 @Component({
     selector: 'example',
@@ -31,17 +34,23 @@ export class userRequestsListComponent {
     public PageSettings: Object;
     public editSettings?: EditSettingsModel;
     public editparams: Object;
-    public teams: string[];
+    public teams: Team[];
     public teamParams: Object;
     public orderData: any = [];
-    public teamName: string
+    public teamName: string;
+    public selectedTeamId: any;
+
+    public updatedRole: Role;
+
+    public isTeamDropdownEnabled: boolean = true;
+
     
     @ViewChild('grid') public grid?: GridComponent;
 
     /**
      * Constructor
      */
-    constructor(private adminService: AdminService,private cdr: ChangeDetectorRef) {}
+    constructor(private adminService: AdminService,private cdr: ChangeDetectorRef,private managerService : ManagerService) {}
 
     ngOnInit(): void {
         //getting all the pending users request
@@ -76,43 +85,42 @@ export class userRequestsListComponent {
     onActionBegin(args: ActionEventArgs) {
         if (args.requestType === 'beginEdit' || args.requestType === 'add') {
             this.orderData = Object.assign({}, args.rowData);
-            // Capture the current value of the team before opening the dialog
-            const currentRowData: UserWithTeamDTO =
-                args.rowData as UserWithTeamDTO;
-
-            // Set the team value to the current value in the table
-            this.teamName = currentRowData.team?.teamName || '';
-    
-        // Manually trigger change detection
-        this.cdr.detectChanges();
-
-
+        // Lock the dropdown if the role is manager or if the role is changing
+        this.isTeamDropdownEnabled = this.orderData.user.role !== Role.MANAGER;
         }
         if (args.requestType === 'save') {
             // args.data contains the updated data
             const updatedData: UserWithTeamDTO = args.data as UserWithTeamDTO;
             console.log('Data to be updated:', updatedData.user);
             const user: User = updatedData.user;
+            
 
             const affectRoleStatusRequest = new AffectRoleStatusRequest(
                 user.idUser,
                 user.role,
                 user.userStatus
             );
-            this.adminService
-                .affectRoleAndChangeStatus(affectRoleStatusRequest)
-                .subscribe({
-                    next: (response) => {
-                        console.log('Update successful', response);
-                    },
-                    error: (error) => {
-                        console.error('Error updating user:', error);
-                    },
-                    complete: () => {
-                        // Optional: Code to execute when the Observable completes
-                        console.log('Update request completed');
-                    },
-                });
+
+            if(this.selectedTeamId != null){
+                this.addCollaboratorToTeam(this.selectedTeamId.id,user.idUser)
+            }
+
+            this.AffectRolesAndStatus(affectRoleStatusRequest)
+
+            if (this.selectedTeamId != null) {
+                this.addCollaboratorToTeam(this.selectedTeamId.id, user.idUser);
+            }
+    
+            this.AffectRolesAndStatus(affectRoleStatusRequest);
+    
+            // Update the data source
+            const index = this.data.findIndex(item => item.user.idUser === user.idUser);
+            if (index !== -1) {
+                this.data[index] = updatedData;
+            }
+    
+            // Fetch the updated list of pending users
+            this.getListPendingUsers();          
         }
     }
     // -----------------------------------------------------------------------------------------------------
@@ -147,18 +155,64 @@ export class userRequestsListComponent {
         });
     }
 
+    onTeamChange(event: any) {
+        this.selectedTeamId = event.itemData;
+        console.log('Selected Team ID:', this.selectedTeamId);
+    }
+
+
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Data methods treatment
+    // -----------------------------------------------------------------------------------------------------
+
+    AffectRolesAndStatus(affectRoleAndChangeStatus : AffectRoleStatusRequest){
+        this.adminService
+        .affectRoleAndChangeStatus(affectRoleAndChangeStatus)
+        .subscribe({
+            next: (response) => {
+                console.log('Update successful', response);
+            },
+            error: (error) => {
+                console.error('Error updating user:', error);
+            },
+            complete: () => {
+                // Optional: Code to execute when the Observable completes
+                console.log('Update request completed');
+            },
+        });
+    }
+
+    addCollaboratorToTeam(userID : number, teamId : number){
+        this.managerService.addNewCollaboratorToTeam(userID,teamId)
+        .subscribe({
+            next: (response) => {
+                console.log('Update successful', response);
+            },
+            error: (error) => {
+                console.error('Error updating user:', error);
+            },
+            complete: () => {
+                // Optional: Code to execute when the Observable completes
+                console.log('Update request completed');
+            },
+        });
+    }
     getAllTeams(): void {
         this.adminService.getAllTeams().subscribe({
             next: (data: AllTeamsCountRequest[]) => {
-                this.teams = data.map(teamData => teamData.team.teamName);
-                console.log(this.teams); // Check the extracted team names
-
+                this.teams = data.map(teamData => ({
+                    id: teamData.team.idTeam,
+                    teamName: teamData.team.teamName
+                }));
+                console.log(this.teams); // Check the extracted team names and IDs
             },
             error: (error) => {
                 console.error('Error fetching teams:', error);
             },
         });
     }
+
 }
 
 interface CustomElement extends Element {
