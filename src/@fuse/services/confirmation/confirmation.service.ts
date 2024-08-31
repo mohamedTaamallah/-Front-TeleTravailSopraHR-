@@ -197,10 +197,10 @@ export class FuseConfirmationService
         });
     }
 
-    openSchedulerParameters(): MatDialogRef<SchedulerParamaetersComponent>
+    openSchedulerParameters(data:{ userInformations: User}): MatDialogRef<SchedulerParamaetersComponent>
     {
         // Merge the user config with the default config
-        const userConfig = merge({}, this._editTeamConfig);
+        const userConfig = merge({}, this._editTeamConfig,data);
 
         // Open the dialog
         return this._matDialog.open(SchedulerParamaetersComponent, {

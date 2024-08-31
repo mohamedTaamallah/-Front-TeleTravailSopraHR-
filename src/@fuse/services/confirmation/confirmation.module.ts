@@ -12,8 +12,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AddTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/addTeam/add-team/add-team.component';
-import { AutoCompleteModule, DropDownList, DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AutoCompleteModule, DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managment/addCollaborator/add-team/addCollaborator.component';
+import { SchedulerParamaetersComponent } from 'app/modules/collaborator/SchedulerParamaeters/SchedulerParamaeters.component';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
     declarations: [
@@ -21,6 +23,7 @@ import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managme
         EditTeamComponent,
         AddTeamComponent,
         AddCollaboratorToTeamComponent,
+        SchedulerParamaetersComponent
         
     ],
     imports     : [
@@ -36,6 +39,7 @@ import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managme
         ReactiveFormsModule ,
         AutoCompleteModule,
         DropDownListModule,
+        MatRadioModule
 
     ],
     providers   : [

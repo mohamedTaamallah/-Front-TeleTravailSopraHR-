@@ -25,6 +25,7 @@ import { Team } from 'app/core/entities/Team';
 import { FuseUtilsService } from '@fuse/services/utils';
 import { forkJoin } from 'rxjs';
 import { UpdateRemoteWorkRequest } from 'app/core/entities/requests/updateRemoteWorkRequest';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
 
 @Component({
     selector: 'example',
@@ -57,7 +58,8 @@ export class collaboratorSchedulerComponent implements OnInit {
     constructor(
         private collaboratorService: CollaboratorService,
         private sessionService: SessionService,
-        private _fuseUtilsService: FuseUtilsService
+        private _fuseUtilsService: FuseUtilsService,
+        private _fuseConfirmationService : FuseConfirmationService
     ) {}
 
     ngOnInit(): void {
@@ -205,8 +207,8 @@ export class collaboratorSchedulerComponent implements OnInit {
             requestStatus: RemoteWorkRequestStatus.PENDING,
         };
 
-        //we letting the validation determine the add or not 
-        this.validateRemoteRequest(remoteWorkRequest)
+        //we letting the validation determine the add or not
+        this.validateRemoteRequest(remoteWorkRequest);
         //this.addRequest(remoteWorkRequest);
     }
 
@@ -220,7 +222,7 @@ export class collaboratorSchedulerComponent implements OnInit {
     }
 
     isStudyDayCheck(date: Date): boolean {
-        const dayOfWeek = date.getDay()+1; // Get the day of the week (0 = Sunday, 6 = Saturday)
+        const dayOfWeek = date.getDay() + 1; // Get the day of the week (0 = Sunday, 6 = Saturday)
         const weekOfMonth = Math.ceil(date.getDate() / 7); // Get the week number within the month
         // Exclude August (7 = August since months are 0-indexed)
         if (date.getMonth() === 7) {
@@ -451,18 +453,15 @@ export class collaboratorSchedulerComponent implements OnInit {
 
     // Handles the add remote work request
     validateRemoteRequest(remoteWorkRequest: RemoteWorkRequest): void {
-        remoteWorkRequest.user = this.user
+        remoteWorkRequest.user = this.user;
         this.collaboratorService
             .validateRemoteWorkRequest(remoteWorkRequest)
             .subscribe({
                 next: (response: any) => {
                     // Handle successful response
-                    console.log(
-                        'Remote Work Request Validation',
-                        response
-                    );
-                    if(response.success == false){
-                        alert(response.message)
+                    console.log('Remote Work Request Validation', response);
+                    if (response.success == false) {
+                        alert(response.message);
                     }
                     this.onFetchData();
                 },
@@ -575,5 +574,23 @@ export class collaboratorSchedulerComponent implements OnInit {
 
         // Return true if the number of approved requests is less than the maximum allowed
         return approvedRequestsInWeek.length < 2;
+    }
+
+     // -----------------------------------------------------------------------------------------------------
+    // @ Study parameters Methods
+    // -----------------------------------------------------------------------------------------------------
+    openEditDialog(): void {
+       let userInformations = this.user
+        const dialogRef2 =
+            this._fuseConfirmationService.openSchedulerParameters({userInformations});
+
+        dialogRef2.afterClosed().subscribe((result: any) => {
+            if (result) {
+                if (result.status === 'confirmed' && result.updatedTeam) {
+                } else if (result.status === 'cancelled') {
+                    console.log('Operation cancelled');
+                }
+            }
+        });
     }
 }

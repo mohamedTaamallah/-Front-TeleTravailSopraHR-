@@ -1,85 +1,97 @@
 <div class="relative flex flex-col w-full h-full">
+    <!-- Dismiss button -->
+    <ng-container *ngIf="data.dismissible">
+        <div class="absolute top-0 right-0 pt-4 pr-4">
+            <button mat-icon-button [matDialogClose]="undefined">
+                <mat-icon class="text-secondary" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+            </button>
+        </div>
+    </ng-container>
 
-  <!-- Dismiss button -->
-  <ng-container *ngIf="data.dismissible">
-      <div class="absolute top-0 right-0 pt-4 pr-4">
-          <button
-              mat-icon-button
-              [matDialogClose]="undefined">
-              <mat-icon
-                  class="text-secondary"
-                  [svgIcon]="'heroicons_outline:x'"></mat-icon>
-          </button>
-      </div>
-  </ng-container>
+    <!-- Content -->
+    <div class="flex flex-col mt-5 p-8 pb-5 bg-card shadow rounded overflow-hidden">
+        <p class="text-lg font-medium">Scheduler Settings</p>
+        <p class="text-secondary">
+            In this section you can configure your study days
+        </p>
+        <mat-divider class="mt-8 mb-5"></mat-divider>
+        <div class="flex flex-col gt-xs:flex-row">
 
-  <!-- Content -->
-  <div class="flex flex-col sm:flex-row flex-auto items-center sm:items-start p-8 pb-6 sm:pb-8">
+        </div>
+        <form [formGroup]="studyParamaetersForm">
+            <div class="flex flex-col mt-2 mb-3 gt-sm:mt-0 gt-sm:ml-16">
+                <span class="font-medium mb-2">Collaborator Type</span>
+            <!-- Role -->
+           <mat-form-field class="flex">
+               <mat-select
+                   [formControlName]="'role'"
+                   required>
+                   <mat-option *ngFor="let role of userRoleValues" [value]="role">
+                       {{ role.viewValue}}
+                   </mat-option>
+               </mat-select>
+               <mat-icon
+                   class="icon-size-5"
+                   matPrefix
+                   [svgIcon]="'heroicons_outline:tag'"
+               ></mat-icon>
+           </mat-form-field>   
+         </div>
 
-      <!-- Icon -->
-      <ng-container *ngIf="data.icon.show">
-          <div
-              class="flex flex-0 items-center justify-center w-10 h-10 sm:mr-4 rounded-full"
-              [ngClass]="{'text-primary-600 bg-primary-100 dark:text-primary-50 dark:bg-primary-600': data.icon.color === 'primary',
-                          'text-accent-600 bg-accent-100 dark:text-accent-50 dark:bg-accent-600': data.icon.color === 'accent',
-                          'text-warn-600 bg-warn-100 dark:text-warn-50 dark:bg-warn-600': data.icon.color === 'warn',
-                          'text-gray-600 bg-gray-100 dark:text-gray-50 dark:bg-gray-600': data.icon.color === 'basic',
-                          'text-blue-600 bg-blue-100 dark:text-blue-50 dark:bg-blue-600': data.icon.color === 'info',
-                          'text-green-500 bg-green-100 dark:text-green-50 dark:bg-green-500': data.icon.color === 'success',
-                          'text-amber-500 bg-amber-100 dark:text-amber-50 dark:bg-amber-500': data.icon.color === 'warning',
-                          'text-red-600 bg-red-100 dark:text-red-50 dark:bg-red-600': data.icon.color === 'error'
-                          }">
-              <mat-icon
-                  class="text-current"
-                  [svgIcon]="data.icon.name"></mat-icon>
-          </div>
-      </ng-container>
 
-      <ng-container *ngIf="data.title || data.message">
-          <div class="flex flex-col items-center sm:items-start mt-4 sm:mt-0 sm:pr-8 space-y-1 text-center sm:text-left">
+            <!-- weeks of the month  -->
+            <div class="flex flex-col mt-2 mb-3 gt-sm:mt-0 gt-sm:ml-16">
+                <span class="font-medium mb-2">Studying weeks for each</span>
+                <mat-radio-group [formControlName]="'isTwoFirstWeek'" class="flex flex-row" [color]="'primary'"
+                    [value]="'just-good'">
+                    <mat-radio-button class="mr-4" [value]="true">
+                        First Two Weeks
+                    </mat-radio-button>
+                    <mat-radio-button [value]="false">
+                        Last Two Weeks
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
 
-              <!-- Title -->
-              <ng-container *ngIf="data.title">
-                  <div
-                      class="text-xl leading-6 font-medium"
-                      [innerHTML]="data.title"></div>
-              </ng-container>
+            <!-- Study Days -->
+            <div class="flex">
+                <mat-form-field class="flex-auto gt-xs:pr-3">
+                    <mat-select [formControlName]="'daysOfStudy'" [placeholder]="'Choose the 2 study days '" multiple
+                        required>
+                        <mat-option *ngFor="let day of daysOfWeek" [value]="day.value">
+                            {{ day.viewValue }}
+                        </mat-option>
+                    </mat-select>
+                    <mat-icon class="icon-size-5" matPrefix [svgIcon]=" 'heroicons_outline:chevron-double-right'"></mat-icon>
+                    <mat-error *ngIf="studyParamaetersForm.get('daysOfStudy').hasError('required')">Please choose study
+                        days</mat-error>
+                    <mat-error
+                        *ngIf="studyParamaetersForm.get('daysOfStudy').hasError('twoDays') && !studyParamaetersForm.get('daysOfStudy').hasError('required')">You
+                        must select exactly two days.</mat-error>
+                </mat-form-field>
+            </div>
+        </form>
 
-              <!-- Message -->
-              <ng-container *ngIf="data.message">
-                  <div
-                      class="text-secondary"
-                      [innerHTML]="data.message"></div>
-              </ng-container>
-          </div>
-      </ng-container>
+    </div>
 
-  </div>
+    <!-- Actions -->
+    <ng-container *ngIf="data.actions.confirm.show || data.actions.cancel.show">
+        <div
+            class="flex items-center justify-center sm:justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-black dark:bg-opacity-10">
+            <!-- Cancel -->
+            <ng-container *ngIf="data.actions.cancel.show">
+                <button mat-stroked-button [matDialogClose]="'cancelled'">
+                    {{ data.actions.cancel.label }}
+                </button>
+            </ng-container>
 
-  <!-- Actions -->
-  <ng-container *ngIf="data.actions.confirm.show || data.actions.cancel.show">
-      <div class="flex items-center justify-center sm:justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-black dark:bg-opacity-10">
-
-          <!-- Cancel -->
-          <ng-container *ngIf="data.actions.cancel.show">
-              <button
-                  mat-stroked-button
-                  [matDialogClose]="'cancelled'">
-                  {{data.actions.cancel.label}}
-              </button>
-          </ng-container>
-
-          <!-- Confirm -->
-          <ng-container *ngIf="data.actions.confirm.show">
-              <button
-                  mat-flat-button
-                  [color]="data.actions.confirm.color"
-                  [matDialogClose]="'confirmed'">
-                  {{data.actions.confirm.label}}
-              </button>
-          </ng-container>
-
-      </div>
-  </ng-container>
-
+            <!-- Confirm -->
+            <ng-container *ngIf="data.actions.confirm.show">
+                <button mat-flat-button [color]="data.actions.confirm.color" type="submit"
+                    [matDialogClose]="'confirmed'" (click)="onSubmit()">
+                    {{ data.actions.confirm.label }}
+                </button>
+            </ng-container>
+        </div>
+    </ng-container>
 </div>
