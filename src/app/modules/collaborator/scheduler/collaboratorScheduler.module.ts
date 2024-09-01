@@ -4,6 +4,7 @@ import { collaboratorSchedulerComponent } from './collaboratorScheduler.componen
 import { ScheduleModule } from '@syncfusion/ej2-angular-schedule';
 import { FuseAlertModule } from '@fuse/components/alert';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 const exampleRoutes: Route[] = [
     {
@@ -19,7 +20,9 @@ const exampleRoutes: Route[] = [
     imports     : [
         RouterModule.forChild(exampleRoutes),
         ScheduleModule,
-        MatButtonModule
+        MatButtonModule,
+        MatIconModule,
+
 
         ], 
          schemas: [CUSTOM_ELEMENTS_SCHEMA],

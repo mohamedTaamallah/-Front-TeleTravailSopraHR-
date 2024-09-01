@@ -15,9 +15,11 @@ export class StudySchedule {
      * @param daysOfStudy - Optional array of study days
      */
     constructor(
+      idDay?: number,
       isTwoFirstWeek?: boolean,
       daysOfStudy?: number[]
   ) {
+      this.idDay = idDay
       this.isTwoFirstWeek = isTwoFirstWeek;
       this.daysOfStudy = daysOfStudy;
   }

@@ -26,6 +26,7 @@ import { FuseUtilsService } from '@fuse/services/utils';
 import { forkJoin } from 'rxjs';
 import { UpdateRemoteWorkRequest } from 'app/core/entities/requests/updateRemoteWorkRequest';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { StudySchedule } from 'app/core/entities/StudySchedule';
 
 @Component({
     selector: 'example',
@@ -59,7 +60,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         private collaboratorService: CollaboratorService,
         private sessionService: SessionService,
         private _fuseUtilsService: FuseUtilsService,
-        private _fuseConfirmationService : FuseConfirmationService
+        private _fuseConfirmationService: FuseConfirmationService
     ) {}
 
     ngOnInit(): void {
@@ -235,8 +236,8 @@ export class collaboratorSchedulerComponent implements OnInit {
 
         // Check if the current week falls within the specified study weeks
         if (
-            (this.user.studySchedule.isTwoFirstWeek && isFirstTwoWeeks) ||
-            (!this.user.studySchedule.isTwoFirstWeek && isLastTwoWeeks)
+            (this.user.studySchedule?.isTwoFirstWeek && isFirstTwoWeeks) ||
+            (!this.user.studySchedule?.isTwoFirstWeek && isLastTwoWeeks)
         ) {
             // Check if the current day is one of the study days
             return this.user.studySchedule.daysOfStudy.includes(dayOfWeek);
@@ -576,21 +577,49 @@ export class collaboratorSchedulerComponent implements OnInit {
         return approvedRequestsInWeek.length < 2;
     }
 
-     // -----------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------
     // @ Study parameters Methods
     // -----------------------------------------------------------------------------------------------------
     openEditDialog(): void {
-       let userInformations = this.user
+        let userInformations = this.user;
         const dialogRef2 =
-            this._fuseConfirmationService.openSchedulerParameters({userInformations});
+            this._fuseConfirmationService.openSchedulerParameters({
+                userInformations,
+            });
 
         dialogRef2.afterClosed().subscribe((result: any) => {
             if (result) {
-                if (result.status === 'confirmed' && result.updatedTeam) {
+                if (result.status === 'confirmed') {
+                    this.onUpdateCollaboratorData(result.isAlternate.value,result.studySchedule)
                 } else if (result.status === 'cancelled') {
                     console.log('Operation cancelled');
                 }
             }
         });
+    }
+    // -----------------------------------------------------------------------------------------------------
+    // @ Study parameters DATAMethods
+    // -----------------------------------------------------------------------------------------------------
+    // Updating the collaborator Information 
+   
+    onUpdateCollaboratorData(isAlternate: boolean, studySchedule: StudySchedule) {
+        this.collaboratorService
+            .updateCollaboratorAlternateStatus(this.user.idUser,isAlternate, studySchedule)
+            .subscribe({
+                next: (updateCollaborator: any) => {
+                    console.log("Update collaborator Data successful")
+                    this.sessionService.clearUser()
+                    this.sessionService.saveUser(updateCollaborator)
+                    this.user = this.sessionService.getUser();
+                    this.onFetchData()
+
+                },
+                error: (error: any) => {
+                    console.error('Error deleting remote work request:', error);
+                },
+                complete: () => {
+                    console.log('Delete complete');
+                },
+            });
     }
 }
