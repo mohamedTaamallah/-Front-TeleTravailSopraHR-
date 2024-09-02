@@ -16,7 +16,7 @@
                 [allowFiltering]="true" [allowGrouping]='true' [filterSettings]="filterSettings"
                 [toolbar]='toolbarOptions' [allowPaging]="true"  (commandClick)="commandClick($event)"
                 [pageSettings]="PageSettings" allowPaging='true' allowGrouping='true' allowSorting='true'
-                showColumnMenu='true' (toolbarClick)='approveAllRequests($event)'>
+                showColumnMenu='true' (toolbarClick)='HandleToolButtons($event)'>
                 <e-columns>
                     <e-column field="fullName" headerText="Collaborator" width="120" textAlign="center"
                         isPrimaryKey="true" [validationRules]="orderidrules">

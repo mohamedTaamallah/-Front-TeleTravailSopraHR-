@@ -10,7 +10,9 @@ import {
 import { ToolbarItemModel } from '@syncfusion/ej2-angular-schedule';
 import { ClickEventArgs } from '@syncfusion/ej2-navigations';
 import { SessionService } from 'app/core/auth/Session/session.service';
+import { Team } from 'app/core/entities/Team';
 import { User } from 'app/core/entities/User';
+import { AdminService } from 'app/core/services/admin/admin.service';
 import { ManagerService } from 'app/core/services/manager/Manager.service';
 
 @Component({
@@ -37,13 +39,19 @@ export class TeamHandleComponent {
     constructor(
         private _managerService: ManagerService,
         private _sessionService: SessionService,
-        private _fuseConfirmationService: FuseConfirmationService
+        private _fuseConfirmationService: FuseConfirmationService,
+        private _adminService : AdminService
     ) {
         this.toolbarOptions = [
             {
                 text: 'Add Collaborator',
-                id: 'customButton',
+                id: 'AddCollborator',
                 prefixIcon: 'e-icons e-add',
+            },
+            {
+                text: 'Team Settings',
+                id: 'TeamSettings',
+                prefixIcon: 'e-icons e-page-setup',
             },
             'Search',
         ];
@@ -96,9 +104,12 @@ export class TeamHandleComponent {
         }
     }
 
-    approveAllRequests(args: ClickEventArgs): void {
-        if (args.item.id === 'customButton') {
+    HandleToolButtons(args: ClickEventArgs): void {
+        if (args.item.id === 'AddCollborator') {
             this.openAddDialog();
+        }
+        else{
+            this.openTeamSettings()
         }
     }
 
@@ -128,13 +139,31 @@ export class TeamHandleComponent {
             .subscribe(
                 (result: { status: string; selectedCollaborator: any }) => {
                     if (result) {
-                        console.log('$$$$$$$$$$$' + result.status);
 
                         if (result.status === 'confirmed') {
-                            console.log('$$$$$$$$$$$' + result);
                             this.onAddNewCollaborator(
                                 result.selectedCollaborator.idUser
                             );
+                        } else if (result.status === 'cancelled') {
+                            console.log('Operation cancelled');
+                        }
+                    }
+                }
+            );
+    }
+
+    openTeamSettings(): void {
+        const dialogRef2 =
+            this._fuseConfirmationService.openTeamSettings(
+                {userInformations : this.user}
+            );
+        dialogRef2
+            .afterClosed()
+            .subscribe(
+                (result: { status: string; selectedCollaborator: any }) => {
+                    if (result) {
+                        if (result.status === 'confirmed') {
+                            console.log(result)
                         } else if (result.status === 'cancelled') {
                             console.log('Operation cancelled');
                         }
@@ -231,5 +260,17 @@ export class TeamHandleComponent {
                     console.log('Adding a collaborator is complete');
                 },
             });
+    }
+
+    onUpdateTeam(team: Team): void {
+        this._adminService.updateTeam(team).subscribe({
+            next: (updatedTeam) => {
+                console.log('Team updated successfully:', updatedTeam);
+                // Handle the updated team, update UI or refresh data if necessary
+            },
+            error: (error) => {
+                console.error('Error updating team:', error);
+            },
+        });
     }
 }

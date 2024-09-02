@@ -9,6 +9,7 @@ import { User } from 'app/core/entities/User';
 import { AddTeamComponent } from 'app/modules/admin/fullTeamMangmentElements/addTeam/add-team/add-team.component';
 import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managment/addCollaborator/add-team/addCollaborator.component';
 import { SchedulerParamaetersComponent } from 'app/modules/collaborator/SchedulerParamaeters/SchedulerParamaeters.component';
+import { TeamSettingsComponent } from 'app/modules/manager/team managment/TeamSettings/TeamSettings.component';
 
 @Injectable()
 export class FuseConfirmationService
@@ -208,6 +209,20 @@ export class FuseConfirmationService
             disableClose: !userConfig.dismissible,
             data        : userConfig,
             panelClass  : 'SchedulerParamaetersComponent'
+        });
+    }
+
+    openTeamSettings(data:{ userInformations: User}): MatDialogRef<TeamSettingsComponent>
+    {
+        // Merge the user config with the default config
+        const userConfig = merge({}, this._editTeamConfig,data);
+
+        // Open the dialog
+        return this._matDialog.open(TeamSettingsComponent, {
+            autoFocus   : false,
+            disableClose: !userConfig.dismissible,
+            data        : userConfig,
+            panelClass  : 'TeamSettingsComponent'
         });
     }
 }

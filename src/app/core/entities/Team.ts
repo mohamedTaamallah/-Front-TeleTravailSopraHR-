@@ -7,6 +7,7 @@ export class Team {
   teamName?: string;
   description?: string;
   onsiteEmployees?: number;
+  teamRemoteWorkBalance?:number
 
   // Relationships
   users?: User[];
@@ -18,12 +19,16 @@ export class Team {
     teamName?: string,
     description?: string,
     onsiteEmployees?: number,
-    manager?: User
+    manager?: User,
+    teamRemoteWorkBalance?:number
   ) {
     this.idTeam = idTeam;
     this.teamName = teamName;
     this.description = description;
     this.onsiteEmployees = onsiteEmployees;
     this.manager = manager;
+    this.teamRemoteWorkBalance = teamRemoteWorkBalance
+
+
   }
 }

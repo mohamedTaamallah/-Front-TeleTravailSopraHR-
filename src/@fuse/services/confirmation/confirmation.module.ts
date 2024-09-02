@@ -16,6 +16,7 @@ import { AutoCompleteModule, DropDownListModule } from '@syncfusion/ej2-angular-
 import { AddCollaboratorToTeamComponent } from 'app/modules/manager/team managment/addCollaborator/add-team/addCollaborator.component';
 import { SchedulerParamaetersComponent } from 'app/modules/collaborator/SchedulerParamaeters/SchedulerParamaeters.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { TeamSettingsComponent } from 'app/modules/manager/team managment/TeamSettings/TeamSettings.component';
 
 @NgModule({
     declarations: [
@@ -23,7 +24,8 @@ import { MatRadioModule } from '@angular/material/radio';
         EditTeamComponent,
         AddTeamComponent,
         AddCollaboratorToTeamComponent,
-        SchedulerParamaetersComponent
+        SchedulerParamaetersComponent,
+        TeamSettingsComponent
         
     ],
     imports     : [

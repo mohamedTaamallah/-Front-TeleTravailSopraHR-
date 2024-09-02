@@ -1,0 +1,101 @@
+<div class="relative flex flex-col w-full h-full">
+  <!-- Dismiss button -->
+  <ng-container *ngIf="data.dismissible">
+      <div class="absolute top-0 right-0 pt-4 pr-4">
+          <button
+              mat-icon-button
+              [matDialogClose]="undefined">
+              <mat-icon
+                  class="text-secondary"
+                  [svgIcon]="'heroicons_outline:x'"></mat-icon>
+          </button>
+      </div>
+  </ng-container>
+
+  <!-- Content -->
+  <form [formGroup]="editTeamForm" (ngSubmit)="onSubmit()">
+      <div class="flex flex-col p-8 pb-5 bg-card shadow rounded overflow-hidden">
+          <p class="text-lg font-medium">Edit Team</p>
+          <p class="text-secondary">
+              In this section you can edit Team and affect a new manager 
+          </p>
+          <mat-divider class="mt-8 mb-10"></mat-divider>
+          <div class="flex flex-col gt-xs:flex-row">
+              <mat-form-field class="flex-auto gt-xs:pr-3">
+                <mat-label>Team Name</mat-label>
+                  <input
+                      matInput
+                      formControlName="teamName"s
+                      [placeholder]="'Team'">
+                  <mat-icon
+                      class="icon-size-5"
+                      matPrefix
+                      [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+              </mat-form-field>
+              <mat-form-field class="flex-auto gt-xs:pl-3">
+                <mat-label>Description</mat-label>
+                  <input
+                      matInput
+                      formControlName="description"
+                      [placeholder]="'Description'">
+                  <mat-icon
+                      class="icon-size-5"
+                      matPrefix
+                      [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+              </mat-form-field>
+              <mat-form-field class="flex-auto gt-xs:pl-3">
+                <mat-label>Team Remote Work Balance</mat-label>
+                <input
+                    matInput
+                    formControlName="teamRemoteWorkBalance"
+                    [placeholder]="'Team Remote Work Balance'">
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+            </mat-form-field>
+            <mat-form-field class="flex-auto gt-xs:pl-3">
+                <mat-label>On Site employees</mat-label>
+                <input
+                type="number"
+                    matInput
+                    formControlName="teamRemoteWorkBalance"
+                    [placeholder]="'Team Remote Work Balance'">
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+            </mat-form-field>
+            
+          </div>
+
+      </div>
+
+      <!-- Actions -->
+      <ng-container *ngIf="data.actions.confirm.show || data.actions.cancel.show">
+          <div class="flex items-center justify-center sm:justify-end px-6 py-4 space-x-3 bg-gray-50 dark:bg-black dark:bg-opacity-10">
+              <!-- Cancel -->
+              <ng-container *ngIf="data.actions.cancel.show">
+                  <button
+                      mat-stroked-button
+                      [matDialogClose]="'cancelled'">
+                      {{ data.actions.cancel.label }}
+                  </button>
+              </ng-container>
+
+              <!-- Confirm -->
+              <ng-container *ngIf="data.actions.confirm.show">
+                  <button
+                      mat-flat-button
+                      [color]="data.actions.confirm.color"
+                      type="submit"
+                      [matDialogClose]="'confirmed'"
+                      (click)="onSubmit()"
+                     >
+                      {{ data.actions.confirm.label }}
+                  </button>
+              </ng-container>
+          </div>
+      </ng-container>
+  </form>
+</div>
