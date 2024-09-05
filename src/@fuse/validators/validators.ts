@@ -134,7 +134,22 @@ export class FuseValidators {
                 : { twoDays: true };
         };
     }
-
+    //validator for the 
+    static onsiteEmployeesLimitValidator(limit: number): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+    
+            if (limit == 1) {
+                // If the limit is less than 1, only allow 1 as the value
+                return value !== 1 ? { lessThanOne: true } : null;
+            } else if (value != null && limit != null && value > (limit / 2)) {
+                // If the value exceeds half of the limit
+                return { exceedLimit: true };
+            }
+            
+            return null; // No error
+        };
+    }
     
 
     

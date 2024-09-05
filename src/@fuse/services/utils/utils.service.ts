@@ -6,14 +6,14 @@ import {
 } from '@syncfusion/ej2-angular-schedule';
 import { BlockedDay } from 'app/core/entities/BlockedDay ';
 import { RemoteWorkRequest } from 'app/core/entities/RemoteWorkRequest';
+import { StudySchedule } from 'app/core/entities/StudySchedule';
 import { User } from 'app/core/entities/User';
 
 @Injectable({
     providedIn: 'root',
 })
 export class FuseUtilsService {
-
-    private user : User 
+    private user: User;
     /**
      * Constructor
      */
@@ -238,6 +238,36 @@ export class FuseUtilsService {
         return isTwoFirstWeek ? isFirstTwoWeeks : isLastTwoWeeks;
     }
 
+    // Helper method to check if the week contains study days
+    isStudyWeek(weekStart: Date, weekEnd: Date, studySchedule: StudySchedule): boolean {
+        // Check each day in the week if it is a study day
+        let isStudyWeek = false;
+        let currentDate = new Date(weekStart);
+
+        while (currentDate <= weekEnd) {
+            const dayOfWeek = currentDate.getDay() + 1; // Get the day of the week (1 = Monday, 7 = Sunday)
+            const weekOfMonth = Math.ceil(currentDate.getDate() / 7); // Get the week number within the month
+
+            // Determine if we are in the first two weeks or the last two weeks
+            const isFirstTwoWeeks = weekOfMonth <= 2;
+            const isLastTwoWeeks = weekOfMonth > 2;
+
+            // Check if the current day is a study day
+            if (
+                (studySchedule?.isTwoFirstWeek && isFirstTwoWeeks) ||
+                (!studySchedule?.isTwoFirstWeek && isLastTwoWeeks)
+            ) {
+                if (studySchedule?.daysOfStudy.includes(dayOfWeek)) {
+                    isStudyWeek = true;
+                    break;
+                }
+            }
+
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return isStudyWeek;
+    }
     // -----------------------------------------------------------------------------------------------------
     // @ Remote work request  List manager   methods
     // -----------------------------------------------------------------------------------------------------

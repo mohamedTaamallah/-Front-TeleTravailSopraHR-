@@ -155,15 +155,16 @@ export class TeamHandleComponent {
     openTeamSettings(): void {
         const dialogRef2 =
             this._fuseConfirmationService.openTeamSettings(
-                {userInformations : this.user}
+                {userInformations : this.user,teamMemebersCount : this.data.length}
             );
         dialogRef2
             .afterClosed()
             .subscribe(
-                (result: { status: string; selectedCollaborator: any }) => {
+                (result: { status: string; updatedTeam: any }) => {
                     if (result) {
                         if (result.status === 'confirmed') {
                             console.log(result)
+                            this.onUpdateTeam(result.updatedTeam)
                         } else if (result.status === 'cancelled') {
                             console.log('Operation cancelled');
                         }
@@ -267,6 +268,7 @@ export class TeamHandleComponent {
             next: (updatedTeam) => {
                 console.log('Team updated successfully:', updatedTeam);
                 // Handle the updated team, update UI or refresh data if necessary
+                this.user.managedTeam = updatedTeam
             },
             error: (error) => {
                 console.error('Error updating team:', error);

@@ -212,7 +212,7 @@ export class FuseConfirmationService
         });
     }
 
-    openTeamSettings(data:{ userInformations: User}): MatDialogRef<TeamSettingsComponent>
+    openTeamSettings(data:{ userInformations: User, teamMemebersCount : number}): MatDialogRef<TeamSettingsComponent>
     {
         // Merge the user config with the default config
         const userConfig = merge({}, this._editTeamConfig,data);

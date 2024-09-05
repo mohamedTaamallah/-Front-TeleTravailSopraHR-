@@ -67,7 +67,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         this.user = this.sessionService.getUser();
         this.maxApprovedRequestsPerDay = this.user.userTeam.onsiteEmployees;
         this.maxApprovedRequestsPerMonth = this.user.remoteWorkBalance;
-
+        console.log(this.user)
         this.onFetchData();
     }
 
@@ -104,6 +104,7 @@ export class collaboratorSchedulerComponent implements OnInit {
         const requestDate = event.StartTime;
         const status = event.Status;
 
+        
         if (args) {
             this.presetTitleAndDescription(args);
         }
@@ -146,7 +147,7 @@ export class collaboratorSchedulerComponent implements OnInit {
                 // Step 2: Validate request based on weekly pending limits
                 this._fuseUtilsService.cancelPopup(
                     args,
-                    'You cannot add more than 2 pending remote work requests in the same week.'
+                    'You cannot add more than '+this.user.userTeam.teamRemoteWorkBalance+' pending remote work requests in the same week.'
                 );
                 return;
             }
@@ -240,7 +241,7 @@ export class collaboratorSchedulerComponent implements OnInit {
             (!this.user.studySchedule?.isTwoFirstWeek && isLastTwoWeeks)
         ) {
             // Check if the current day is one of the study days
-            return this.user.studySchedule.daysOfStudy.includes(dayOfWeek);
+            return this.user.studySchedule?.daysOfStudy.includes(dayOfWeek);
         }
 
         return false;
@@ -538,7 +539,7 @@ export class collaboratorSchedulerComponent implements OnInit {
             }
         );
 
-        return pendingRequestsThisWeek.length >= 2;
+        return pendingRequestsThisWeek.length >= this.user.userTeam.teamRemoteWorkBalance;
     }
 
     //prohibit the from adding a remote work request other than the current month
@@ -551,31 +552,36 @@ export class collaboratorSchedulerComponent implements OnInit {
         return currentMonth !== eventMonth || currentYear !== eventYear;
     }
 
-    //checks if there is one pending request for a week with study days
-    canAddRemoteWorkRequestForWeek(date: Date): boolean {
-        const weekStart = this._fuseUtilsService.getStartOfWeek(date);
-        const weekEnd = this._fuseUtilsService.getEndOfWeek(date);
+// Checks if there is one pending request for a week with study days
+canAddRemoteWorkRequestForWeek(date: Date): boolean {
+    const weekStart = this._fuseUtilsService.getStartOfWeek(date);
+    const weekEnd = this._fuseUtilsService.getEndOfWeek(date);
 
-        if (date.getMonth() === 7) {
-            //no study days should be visible for August
-            return true;
-        }
-        // Filter approved remote work requests for the same user in the given week
-        const approvedRequestsInWeek = this.remoteWorkRequests.filter(
-            (request) => {
-                const requestDate = new Date(request.requestDate);
-                return (
-                    requestDate >= weekStart &&
-                    requestDate <= weekEnd &&
-                    request.requestStatus === RemoteWorkRequestStatus.PENDING &&
-                    request.user.idUser === this.user.idUser
-                );
-            }
-        );
+    // Check if the current week contains study days
+    const isStudyWeek = this._fuseUtilsService.isStudyWeek(weekStart, weekEnd,this.user.studySchedule);
 
-        // Return true if the number of approved requests is less than the maximum allowed
-        return approvedRequestsInWeek.length < 2;
+    if (!isStudyWeek) {
+        // If it's not a study week, allow adding requests without additional checks
+        return true;
     }
+
+    // Filter pending remote work requests for the same user in the given week
+    const pendingRequestsInWeek = this.remoteWorkRequests.filter(
+        (request) => {
+            const requestDate = new Date(request.requestDate);
+            return (
+                requestDate >= weekStart &&
+                requestDate <= weekEnd &&
+                request.requestStatus === RemoteWorkRequestStatus.PENDING &&
+                request.user.idUser === this.user.idUser
+            );
+        }
+    );
+
+    // Return true if the number of pending requests is less than the maximum allowed
+    return pendingRequestsInWeek.length < 1;
+}
+
 
     // -----------------------------------------------------------------------------------------------------
     // @ Study parameters Methods

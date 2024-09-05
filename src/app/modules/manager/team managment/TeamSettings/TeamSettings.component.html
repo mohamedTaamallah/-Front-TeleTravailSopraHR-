@@ -47,6 +47,7 @@
                 <mat-label>Team Remote Work Balance</mat-label>
                 <input
                     matInput
+                    type="number"
                     formControlName="teamRemoteWorkBalance"
                     [placeholder]="'Team Remote Work Balance'">
                 <mat-icon
@@ -57,10 +58,16 @@
             <mat-form-field class="flex-auto gt-xs:pl-3">
                 <mat-label>On Site employees</mat-label>
                 <input
-                type="number"
                     matInput
-                    formControlName="teamRemoteWorkBalance"
-                    [placeholder]="'Team Remote Work Balance'">
+                    type="number"
+                    formControlName="onsiteEmployees"
+                    [placeholder]="'On site employees'">
+                    <mat-error *ngIf="editTeamForm.get('onsiteEmployees').hasError('lessThanOne')">
+                        The team has only one member already 
+                    </mat-error>
+                    <mat-error *ngIf="editTeamForm.get('onsiteEmployees').hasError('exceedLimit')">
+                        The number of on site employees can only be equal or superior to {{ onSiterEmployeesLimit/2 }}         
+                    </mat-error>
                 <mat-icon
                     class="icon-size-5"
                     matPrefix
