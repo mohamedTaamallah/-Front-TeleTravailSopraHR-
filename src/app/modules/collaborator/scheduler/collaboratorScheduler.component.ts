@@ -538,7 +538,6 @@ export class collaboratorSchedulerComponent implements OnInit {
                 return requestDate >= startOfWeek && requestDate <= endOfWeek;
             }
         );
-
         return pendingRequestsThisWeek.length >= this.user.userTeam.teamRemoteWorkBalance;
     }
 

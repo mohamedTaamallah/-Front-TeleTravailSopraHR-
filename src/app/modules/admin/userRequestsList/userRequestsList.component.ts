@@ -50,7 +50,7 @@ export class userRequestsListComponent {
     /**
      * Constructor
      */
-    constructor(private adminService: AdminService,private cdr: ChangeDetectorRef,private managerService : ManagerService) {}
+    constructor(private adminService: AdminService,private managerService : ManagerService) {}
 
     ngOnInit(): void {
         //getting all the pending users request
