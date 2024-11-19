@@ -39,6 +39,7 @@ export class RemoteWorkRequestListComponent implements OnInit {
         { text: 'Approved', value: 'APPROVED' },
         { text: 'Refused', value: 'REFUSED' },
     ];
+    public fields = { value: 'value', text: 'text' };
 
     public orderData: any = [];
     public updatedStatus: RemoteWorkRequestStatus;
@@ -75,7 +76,6 @@ export class RemoteWorkRequestListComponent implements OnInit {
         this.filterSettings = { type: 'CheckBox' };
         this.PageSettings = { pageSizes: true, pageSize: 12 };
     }
-    public fields = { value: 'value', text: 'text' };
 
     actionBegin(args: any) {
         if (args.requestType === 'beginEdit' || args.requestType === 'add') {

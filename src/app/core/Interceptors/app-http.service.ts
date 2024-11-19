@@ -19,7 +19,7 @@ export class AppHttpService implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
     // Check if the request URL includes "/login" or "/register"
-    if (request.url.includes("auth")) {
+    if (request.url.includes("api")) {
       // If it's a login or register request, bypass interceptor logic
       return next.handle(request);
     }

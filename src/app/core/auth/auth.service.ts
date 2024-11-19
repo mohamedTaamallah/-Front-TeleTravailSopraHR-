@@ -56,6 +56,16 @@ export class AuthService
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
+
+    /**
+     * send mail for forget password 
+     *
+     * 
+     */
+    sendMailForgetPassword(email: string): Observable<User> {
+        return this._httpClient.get<any>(`${this._authApiUrl}/sendMailForgetPassword/${email}`)
+    }
+
     /**
      * Forgot password
      *
