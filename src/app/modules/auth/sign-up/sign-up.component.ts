@@ -189,10 +189,12 @@ export class AuthSignUpComponent implements OnInit {
 
         this.mapFormDataToUser();
 
-        
+        console.log(this.user)
 
         // Hide the alert
         this.showAlert = false;
+
+        console.log(this.user)
 
         // Sign up
         this._authService.signUp(this.user).subscribe(
@@ -241,6 +243,7 @@ export class AuthSignUpComponent implements OnInit {
         };
 
         this.user.studySchedule = new StudySchedule(
+            null,
             step3Values.isTwoFirstWeek,
             step3Values.daysOfStudy
         );
